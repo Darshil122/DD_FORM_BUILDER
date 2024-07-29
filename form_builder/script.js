@@ -1,198 +1,215 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const draggables = document.querySelectorAll('.draging');
-    const formArea = document.getElementById('form-area');
+document.addEventListener("DOMContentLoaded", () => {
+  const draggables = document.querySelectorAll(".draging");
+  const formArea = document.getElementById("form-area");
 
-    draggables.forEach(draggable => {
-        draggable.addEventListener('dragstart', handleDragStart);
-    });
+  draggables.forEach((draggable) => {
+    draggable.addEventListener("dragstart", handleDragStart);
+  });
 
-    formArea.addEventListener('dragover', handleDragOver);
-    formArea.addEventListener('drop', handleDrop);
+  formArea.addEventListener("dragover", handleDragOver);
+  formArea.addEventListener("drop", handleDrop);
 
-    new Sortable(formArea, {
-        animation: 150,
-        ghostClass: 'sortable-ghost'
-    });
+  new Sortable(formArea, {
+    animation: 150,
+    ghostClass: "sortable-ghost",
+  });
 
-    function handleDragStart(event) {
-        event.dataTransfer.setData('text/plain', event.target.dataset.type);
+  function handleDragStart(event) {
+    event.dataTransfer.setData("text/plain", event.target.dataset.type);
+  }
+
+  function handleDragOver(event) {
+    event.preventDefault();
+  }
+
+  function handleDrop(event) {
+    event.preventDefault();
+    const fieldType = event.dataTransfer.getData("text/plain");
+    addFieldToFormArea(fieldType);
+  }
+
+  function addFieldToFormArea(fieldType) {
+    let fieldHTML = "";
+
+    switch (fieldType) {
+      case "text":
+        fieldHTML = getTextFieldHTML();
+        break;
+      case "number":
+        fieldHTML = getNumberFieldHTML();
+        break;
+      case "email":
+        fieldHTML = getEmailFieldHTML();
+        break;
+      case "password":
+        fieldHTML = getPasswordFieldHTML();
+        break;
+      case "radio":
+        fieldHTML = getRadioFieldHTML();
+        break;
+      case "dropdown":
+        fieldHTML = getDropdownFieldHTML();
+        break;
+      case "message":
+        fieldHTML = getMessageFieldHTML();
+        break;
+      case "checkbox":
+        fieldHTML = getCheckboxFieldHTML();
+        break;
+      case "date":
+        fieldHTML = getDateFieldHTML();
+        break;
+      case "time":
+        fieldHTML = getTimeFieldHTML();
+        break;
+      case "datetime":
+        fieldHTML = getDateTimeFieldHTML();
+        break;
+      case "week":
+        fieldHTML = getWeekFieldHTML();
+        break;
+      default:
+        console.error("Unknown field type:", fieldType);
     }
 
-    function handleDragOver(event) {
-        event.preventDefault();
-    }
+    formArea.insertAdjacentHTML("beforeend", fieldHTML);
+  }
 
-    function handleDrop(event) {
-        event.preventDefault();
-        const fieldType = event.dataTransfer.getData('text/plain');
-        addFieldToFormArea(fieldType);
-    }
-
-    function addFieldToFormArea(fieldType) {
-        let fieldHTML = '';
-
-        switch (fieldType) {
-            case 'text':
-                fieldHTML = getTextFieldHTML();
-                break;
-            case 'number':
-                fieldHTML = getNumberFieldHTML();
-                break;
-            case 'email':
-                fieldHTML = getEmailFieldHTML();
-                break;
-            case 'password':
-                fieldHTML = getPasswordFieldHTML();
-                break;
-            case 'radio':
-                fieldHTML = getRadioFieldHTML();
-                break;
-            case 'dropdown':
-                fieldHTML = getDropdownFieldHTML();
-                break;
-            case 'message':
-                fieldHTML = getMessageFieldHTML();
-                break;
-            case 'checkbox':
-                fieldHTML = getCheckboxFieldHTML();
-                break;
-            case 'date':
-                fieldHTML = getDateFieldHTML();
-                break;
-            case 'time':
-                fieldHTML = getTimeFieldHTML();
-                break;
-            case 'DateTime':
-                fieldHTML = getDateTimeFieldHTML();
-                break;
-            case 'week':
-                fieldHTML = getWeekFieldHTML();
-                break;
-            default:
-                console.error('Unknown field type:', fieldType);
-        }
-
-        formArea.insertAdjacentHTML('beforeend', fieldHTML);
-    }
-
-    function getTextFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label for="text" class="form-label">Text Field:</label>
-                <input type="text" class="form-control" id="text" placeholder="Enter text">
-            </div>
-        `;
-    }
-
-    function getNumberFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label for="number" class="form-label">Number Field:</label>
-                <input type="number" class="form-control" id="number" placeholder="Enter number">
-            </div>
-        `;
-    }
-
-    function getEmailFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label for="email" class="form-label">Email Field:</label>
-                <input type="email" class="form-control" id="email" placeholder="Enter email">
-            </div>
-        `;
-    }
-
-    function getPasswordFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label for="password" class="form-label">Password Field:</label>
-                <input type="password" class="form-control" id="password" placeholder="Enter password">
-            </div>
-        `;
-    }
-
-    function getRadioFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label class="form-label">Radio Field:</label>
-                <div>
-                    <input type="radio" name="radio" value="option1"> Option 1&nbsp;
-                    <input type="radio" name="radio" value="option2"> Option 2
+  function createFieldTemplate(label, inputHTML) {
+    return `
+                <div class="form-field dragg" draggable="true" style="grid-column: span 1;">
+                    <label class="form-label">${label}</label>
+                    ${inputHTML}
+                    <button class="toggle-width-btn" onclick="toggleFieldWidth(this)">Toggle Width</button>
                 </div>
-            </div>
-        `;
-    }
+            `;
+  }
 
-    function getDropdownFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label for="dropdown" class="form-label">Dropdown Field:</label>
-                <select class="form-control" id="dropdown">
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
+  function getTextFieldHTML() {
+    return createFieldTemplate(
+      "Text Field",
+      '<input type="text" class="form-control" placeholder="Enter text">'
+    );
+  }
+
+  function getNumberFieldHTML() {
+    return createFieldTemplate(
+      "Number Field",
+      '<input type="number" class="form-control" placeholder="Enter number">'
+    );
+  }
+
+  function getEmailFieldHTML() {
+    return createFieldTemplate(
+      "Email Field",
+      '<input type="email" class="form-control" placeholder="Enter email">'
+    );
+  }
+
+  function getPasswordFieldHTML() {
+    return createFieldTemplate(
+      "Password Field",
+      '<input type="password" class="form-control" placeholder="Enter password">'
+    );
+  }
+
+  function getRadioFieldHTML() {
+    return createFieldTemplate(
+      "Radio Field",
+      `
+                <input type="radio" name="radio" value="option1"> Option 1<br>
+                <input type="radio" name="radio" value="option2"> Option 2
+            `
+    );
+  }
+
+  function getDropdownFieldHTML() {
+    return createFieldTemplate(
+      "Dropdown List",
+      `
+                <select class="form-control">
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
                 </select>
-            </div>
-        `;
-    }
+            `
+    );
+  }
 
-    function getMessageFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label for="message" class="form-label">Message Field:</label>
-                <textarea class="form-control" id="message" rows="4" placeholder="Enter message"></textarea>
-            </div>
-        `;
-    }
+  function getMessageFieldHTML() {
+    return createFieldTemplate(
+      "Message Field",
+      '<textarea class="form-control" rows="4" placeholder="Enter message"></textarea>'
+    );
+  }
 
-    function getCheckboxFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label class="form-label">Checkbox Field:</label>
-                <div>
-                    <input type="checkbox" id="checkbox1" value="option1">
-                    <label for="checkbox1">Option 1</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="checkbox2" value="option2">
-                    <label for="checkbox2">Option 2</label>
-                </div>
-            </div>
-        `;
-    }
+  function getCheckboxFieldHTML() {
+    return createFieldTemplate(
+      "Checkbox Field",
+      `
+                <input type="checkbox" value="1"> Checkbox 1<br>
+                <input type="checkbox" value="2"> Checkbox 2
+            `
+    );
+  }
 
-    function getDateFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label for="date" class="form-label">Date Field</label>
-                <input type="date" class="form-control" id="date">
-            </div>
-        `;
-    }
+  function getDateFieldHTML() {
+    return createFieldTemplate(
+      "Date Field",
+      '<input type="date" class="form-control">'
+    );
+  }
 
-    function getTimeFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label for="time" class="form-label">Time Field</label>
-                <input type="time" class="form-control" id="time">
-            </div>
-        `;
-    }
+  function getTimeFieldHTML() {
+    return createFieldTemplate(
+      "Time Field",
+      '<input type="time" class="form-control">'
+    );
+  }
 
-    function getDateTimeFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label for="dateTime" class="form-label">Date Time Field</label>
-                <input type="datetime-local" class="form-control" id="dateTime">
-            </div>
-        `;
-    }
+  function getDateTimeFieldHTML() {
+    return createFieldTemplate(
+      "Date Time Field",
+      '<input type="datetime-local" class="form-control">'
+    );
+  }
 
-    function getWeekFieldHTML() {
-        return `
-            <div class="form-field draggable-field" draggable="true">
-                <label for="week" class="form-label">Week Field</label>
-                <input type="week" class="form-control" id="week">
-            </div>
-        `;
-    }
+  function getWeekFieldHTML() {
+    return createFieldTemplate(
+      "Week Field",
+      '<input type="week" class="form-control">'
+    );
+  }
+
+  window.toggleFieldWidth = function (button) {
+    const field = button.parentElement;
+    const currentSpan = field.style.gridColumn;
+    field.style.gridColumn = currentSpan === "span 2" ? "span 1" : "span 2";
+  };
+});
+
+document.querySelector(".createform").addEventListener("click", function () {
+  const formName = document.getElementById("form-name").value.trim();
+  const formData = [];
+
+  if (!formName) {
+    alert("Please enter a form name.");
+    window.location.href = "index.php"; // Correct redirection
+    return;
+  }
+
+  document.querySelectorAll("#form-area .form-field").forEach((field) => {
+    const fieldType =
+      field.querySelector("input, select, textarea").getAttribute("type") ||
+      "text";
+    const fieldLabel = field.querySelector("label").innerText;
+    formData.push({
+      label: fieldLabel,
+      type: fieldType,
+    });
+  });
+
+  document.getElementById("form_data").value = JSON.stringify({
+    formName,
+    fields: formData,
+  });
 });

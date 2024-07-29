@@ -10,6 +10,7 @@
             </div>
 
             <ul class="inputField flex-column" style="list-style-type: none;  padding-left: 10px;">
+                
                 <li class="draging" draggable="true" data-type="text">
                     <label for="text">Text&nbsp;:</label>
                     <input type="text" name="text" id="text" placeholder="ex.FirstName" disabled>
@@ -38,7 +39,7 @@
                 <li class="draging nav-item" draggable="true" data-type="radio">
                     <label for="radio">Radio&nbsp;:</label><br>
                     <input type="radio" name="radio" id="radio" value="radio" disabled>&nbsp;radio&nbsp;
-                    <br><input type="radio" name="radio" id="radio" value="radio" disabled>&nbsp;radio
+                    <br><input type="radio" name="radio" id="radio" value="radio" disabled>&nbsp;radio  
                 </li>
                 <hr>
                 <li class="draging nav-item" draggable="true" data-type="dropdown">
