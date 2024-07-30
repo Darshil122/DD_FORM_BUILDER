@@ -77,12 +77,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function createFieldTemplate(label, inputHTML) {
     return `
-                <div class="form-field dragg" draggable="true" style="grid-column: span 1;">
-                    <label class="form-label">${label}</label>
-                    ${inputHTML}
-                    <button class="toggle-width-btn" onclick="toggleFieldWidth(this)">Toggle Width</button>
-                </div>
-            `;
+                    <div class="form-field dragg" draggable="true" style="grid-column: span 1;">
+                        <label class="form-label">${label}</label>
+                        ${inputHTML}
+                        <button class="toggle-width-btn" onclick="toggleFieldWidth(this)">Toggle Width</button>
+                    </div>
+                `;
   }
 
   function getTextFieldHTML() {
@@ -117,9 +117,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return createFieldTemplate(
       "Radio Field",
       `
-                <input type="radio" name="radio" value="option1"> Option 1<br>
-                <input type="radio" name="radio" value="option2"> Option 2
-            `
+                    <div class="radio-field">
+                        <input type="radio" name="radio" value="option1">
+                        <label>Option 1</label>
+                    </div>
+                    <div class="radio-field">
+                        <input type="radio" name="radio" value="option2">
+                        <label>Option 2</label>
+                    </div>
+                `
     );
   }
 
@@ -127,11 +133,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return createFieldTemplate(
       "Dropdown List",
       `
-                <select class="form-control">
-                    <option value="1">Option 1</option>
-                    <option value="2">Option 2</option>
-                </select>
-            `
+                    <select class="form-control">
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                    </select>
+                `
     );
   }
 
@@ -146,9 +152,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return createFieldTemplate(
       "Checkbox Field",
       `
-                <input type="checkbox" value="1"> Checkbox 1<br>
-                <input type="checkbox" value="2"> Checkbox 2
-            `
+                    <input type="checkbox" value="1"> Checkbox 1<br>
+                    <input type="checkbox" value="2"> Checkbox 2
+                `
     );
   }
 
@@ -185,31 +191,50 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentSpan = field.style.gridColumn;
     field.style.gridColumn = currentSpan === "span 2" ? "span 1" : "span 2";
   };
-});
 
-document.querySelector(".createform").addEventListener("click", function () {
-  const formName = document.getElementById("form-name").value.trim();
-  const formData = [];
+  document.querySelector(".createform").addEventListener("click", function () {
+    const formName = document.getElementById("formName").value;
+    if (!formName) {
+      alert("Please enter a form name.");
+      return;
+    }
 
-  if (!formName) {
-    alert("Please enter a form name.");
-    window.location.href = "index.php"; // Correct redirection
-    return;
-  }
+    const formFields = document.querySelectorAll("#form-area .form-field");
+    const formData = [];
 
-  document.querySelectorAll("#form-area .form-field").forEach((field) => {
-    const fieldType =
-      field.querySelector("input, select, textarea").getAttribute("type") ||
-      "text";
-    const fieldLabel = field.querySelector("label").innerText;
-    formData.push({
-      label: fieldLabel,
-      type: fieldType,
+    formFields.forEach((field) => {
+      const label = field.querySelector("label").innerText;
+      const input = field.querySelector("input, select, textarea");
+      const type =
+        input.tagName.toLowerCase() === "input"
+          ? input.type
+          : input.tagName.toLowerCase();
+      const placeholder = input.placeholder || "";
+      formData.push({ label, type, placeholder });
     });
+
+    saveFormToDatabase(formName, formData);
   });
 
-  document.getElementById("form_data").value = JSON.stringify({
-    formName,
-    fields: formData,
-  });
+  function saveFormToDatabase(formName, formData) {
+    fetch('routes.php?action=saveForm', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ formName, formData })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Form saved successfully!');
+        } else {
+            alert('Failed to save form. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while saving the form.');
+    });
+}
 });

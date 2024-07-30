@@ -5,10 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/jpg" href="./dist/img/logo.png">
-    <link rel="stylesheet" href="./style.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <link rel="stylesheet" href="style.css">
 
-    <!-- css link -->
-    <?php include "./Include/style.php"; ?>
     <title>Form Builder</title>
 </head>
 
@@ -26,16 +28,17 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12 justify-content-center">
-                            <input type="text" id="form-name" class="form-control" placeholder="Enter Form Name">
+                            <input type="text" name="formName" id="formName" class="form-control" placeholder="Enter Form Name">
                         </div>
                         <div class="col-5 box" id="form-area">
                             <!-- Form fields will be dropped here -->
                         </div>
                         <div class="row">
                             <div class="col-lg-4 col-md-6">
-                                <form id="dynamic-form" action="controller.php" method="POST">
+                                <form id="dynamic-form" action="" method="POST">
                                     <input type="hidden" name="form_data" id="form_data">
-                                    <button type="submit" class="createform btn-primary">Create Form</button>
+                                    <button type="submit" class="createform" onclick="createForm()">Create
+                                        Form</button>
                                 </form>
                             </div>
                         </div>
@@ -52,13 +55,17 @@
     </div>
 
     <!-- script -->
-    <?php include "./Include/script.php" ?>
+
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
     <script src="./script.js"></script>
-
-    <script>
-  
-    </script>
+    <!-- jQuery -->
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <!-- jQuery UI 1.11.4 -->
+    <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <script src="plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 </body>
 
 </html>

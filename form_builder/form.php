@@ -8,23 +8,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Form List</title>
-    <style>
-    .formlist {
-        position: relative;
-        top: 60px;
-        left: 30%;
-        width: 110px;
-        height: 100px;
-        border: 1px solid black;
-    }
-    .foot{
-        position: absolute;
-        top: 94.5%;
-        background-color: rgba(0, 0, 0, 0.2);
-        width: 100%;
-    }
-    </style>
+ 
 </head>
 
 <body class="hold-transition layout-fixed">
@@ -37,9 +23,17 @@
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-4 col-lg-5 formlist" id="form-area">
-                        <!-- Form fields will be dropped here -->
-                    </div>
+                <?php
+                    // Example URL: routes.php?action=displayForm&form_id=1
+                    if (isset($_GET['form_id'])) {
+                        require 'routes.php';
+                    } else {
+                        echo "Form ID not provided.";
+                    }
+                ?>
+                    <!-- <div class="col-md-4 col-lg-5 formlist" id="form-area">
+                         Form fields will be dropped here 
+                    </div> -->
 
                 </div>
             </div>
