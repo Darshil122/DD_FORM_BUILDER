@@ -28,18 +28,30 @@ class FormController {
         $data = json_decode(file_get_contents('php://input'), true);
         $formName = $data['formName'];
         $formData = $data['formData'];
-
+    
+        if (empty($formName) || empty($formData)) {
+            echo json_encode(['success' => false, 'error' => 'Form name or data is empty.']);
+            return;
+        }
+    
         $stmt = $this->conn->prepare("INSERT INTO forms (name, fields) VALUES (?, ?)");
-        $stmt->bind_param("ss", $formName, json_encode($formData));
-
+        if ($stmt === false) {
+            echo json_encode(['success' => false, 'error' => 'Prepare failed: ' . $this->conn->error]);
+            return;
+        }
+    
+        $jsonFormData = json_encode($formData);
+        $stmt->bind_param("ss", $formName, $jsonFormData);
+    
         if ($stmt->execute()) {
             echo json_encode(['success' => true]);
         } else {
-            echo json_encode(['success' => false, 'error' => $stmt->error]);
+            echo json_encode(['success' => false, 'error' => 'Execute failed: ' . $stmt->error]);
         }
-
+    
         $stmt->close();
     }
+    
 
     public function displayForm($formId) {
         $stmt = $this->conn->prepare("SELECT name, fields FROM forms WHERE id = ?");

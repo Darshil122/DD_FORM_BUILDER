@@ -217,24 +217,25 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function saveFormToDatabase(formName, formData) {
-    fetch('routes.php?action=saveForm', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ formName, formData })
+    fetch("routes.php?action=saveForm", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ formName, formData }),
     })
-    .then(response => response.json())
-    .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         if (data.success) {
-            alert('Form saved successfully!');
+          alert("Form saved successfully!");
         } else {
-            alert('Failed to save form. Please try again.');
+          console.error("Error saving form:", data.error);
+          alert("Failed to save form: " + data.error);
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while saving the form.');
-    });
-}
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("An error occurred while saving the form.");
+      });
+  }
 });

@@ -27,21 +27,24 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-12 justify-content-center">
-                            <input type="text" name="formName" id="formName" class="form-control" placeholder="Enter Form Name">
-                        </div>
-                        <div class="col-5 box" id="form-area">
-                            <!-- Form fields will be dropped here -->
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-4 col-md-6">
-                                <form id="dynamic-form" action="" method="POST">
-                                    <input type="hidden" name="form_data" id="form_data">
-                                    <button type="submit" class="createform" onclick="createForm()">Create
-                                        Form</button>
-                                </form>
+                        <!-- <form id="dynamic-form" action="routes.php?action=saveForm" method="POST"> -->
+                            <div class="col-12 justify-content-center">
+                                <input type="text" name="formName" id="formName" class="form-control"
+                                    placeholder="Enter Form Name">
                             </div>
-                        </div>
+                            <div class="col-5 box" id="form-area">
+                                <!-- Form fields will be dropped here -->
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <form id="dynamic-form" action="" method="POST">
+                                        <input type="hidden" name="form_data" id="form_data">
+                                        <button type="submit" class="createform" onclick="createForm()">Create
+                                            Form</button>
+                                    </form>
+                                </div>
+                            </div>
+                        <!-- </form> -->
                     </div>
                 </div>
             </section>
