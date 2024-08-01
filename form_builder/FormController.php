@@ -7,7 +7,7 @@ class FormController {
         $servername = "localhost";
         $username = "root";
         $password = "";
-        $dbname = "formbuilder";
+        $dbname = "form_builders";
 
         // Create connection
         $this->conn = mysqli_connect($servername, $username, $password, $dbname);
@@ -34,7 +34,7 @@ class FormController {
             return;
         }
     
-        $stmt = $this->conn->prepare("INSERT INTO forms (name, fields) VALUES (?, ?)");
+        $stmt = $this->conn->prepare("INSERT INTO forms_master (form_name, form_fields) VALUES (?, ?)");
         if ($stmt === false) {
             echo json_encode(['success' => false, 'error' => 'Prepare failed: ' . $this->conn->error]);
             return;
@@ -54,7 +54,7 @@ class FormController {
     
 
     public function displayForm($formId) {
-        $stmt = $this->conn->prepare("SELECT name, fields FROM forms WHERE id = ?");
+        $stmt = $this->conn->prepare("SELECT form_name, form_fields FROM forms_master WHERE id = ?");
         $stmt->bind_param("i", $formId);
         $stmt->execute();
         $stmt->bind_result($formName, $formFields);

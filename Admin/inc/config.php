@@ -1,4 +1,4 @@
 <?php
-$con = mysqli_connect("localhost", "root", "", "FormBuilder");
+$con = mysqli_connect("localhost", "root", "", "form_builders");
 
 ?>
