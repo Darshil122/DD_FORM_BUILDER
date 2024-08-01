@@ -192,50 +192,54 @@ document.addEventListener("DOMContentLoaded", () => {
     field.style.gridColumn = currentSpan === "span 2" ? "span 1" : "span 2";
   };
 
-  document.querySelector(".createform").addEventListener("click", function () {
-    const formName = document.getElementById("formName").value;
+  const formNameInput = document.getElementById("formName");
+  // const formArea = document.getElementById('form-area');
+  const formDataInput = document.getElementById("form_data");
+
+  function createForm() {
+    const formName = formNameInput.value;
     if (!formName) {
       alert("Please enter a form name.");
       return;
     }
 
-    const formFields = document.querySelectorAll("#form-area .form-field");
-    const formData = [];
-
-    formFields.forEach((field) => {
-      const label = field.querySelector("label").innerText;
-      const input = field.querySelector("input, select, textarea");
-      const type =
-        input.tagName.toLowerCase() === "input"
-          ? input.type
-          : input.tagName.toLowerCase();
-      const placeholder = input.placeholder || "";
-      formData.push({ label, type, placeholder });
+    const formFields = Array.from(formArea.children).map((field) => {
+      return {
+        label: field.querySelector("label").innerText,
+        type: field.querySelector("input, textarea").type,
+      };
     });
 
-    saveFormToDatabase(formName, formData);
-  });
+    formDataInput.value = JSON.stringify({
+      formName: formName,
+      formData: formFields,
+    });
 
-  function saveFormToDatabase(formName, formData) {
-    fetch("routes.php?action=saveForm", {
+    // Fetch request to save form data
+    fetch("FormController.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ formName, formData }),
+      body: formDataInput.value,
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
           alert("Form saved successfully!");
         } else {
-          console.error("Error saving form:", data.error);
-          alert("Failed to save form: " + data.error);
+          alert("Error: " + data.error);
         }
       })
       .catch((error) => {
         console.error("Error:", error);
-        alert("An error occurred while saving the form.");
       });
   }
+
+  document
+    .getElementById("dynamic-form")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
+      createForm();
+    });
 });
