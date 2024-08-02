@@ -4,6 +4,7 @@
 
   include "../Admin/inc/config.php";
   if(isset($_POST['login'])){
+    // $id = $_POST['id'];
     $email = mysqli_real_escape_string($con, $_POST['email']);
     $password =mysqli_real_escape_string($con, $_POST['password']);
     // $rememberme =mysqli_real_escape_string($conn, $_POST['rememberme']);
@@ -28,8 +29,9 @@
       $result = mysqli_query($con,$sql);
 
       $rows = mysqli_num_rows($result);
+      $id = mysqli_fetch_array($result);
       if ($rows == 1) {
-        $_SESSION['user_id'] = $id;
+        $_SESSION['id'] = $id[0];
         $_SESSION["login"] = true;
         $_SESSION["email"] = $email;
         header("Location: index.php");

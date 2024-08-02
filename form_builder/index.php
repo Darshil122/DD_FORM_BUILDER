@@ -7,6 +7,10 @@
     <link rel="icon" type="image/jpg" href="./dist/img/logo.png">
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- Font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
     <link rel="stylesheet" href="style.css">
@@ -28,22 +32,22 @@
                 <div class="container-fluid">
                     <div class="row">
                         <!-- <form id="dynamic-form" action="routes.php?action=saveForm" method="POST"> -->
-                            <div class="col-12 justify-content-center">
-                                <input type="text" name="formName" id="formName" class="form-control"
-                                    placeholder="Enter Form Name">
+                        <div class="col-12 justify-content-center">
+                            <input type="text" name="formName" id="formName" class="form-control"
+                                placeholder="Enter Form Name">
+                        </div>
+                        <div class="col-5 box" id="form-area">
+                            <!-- Form fields will be dropped here -->
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                                <form id="dynamic-form" action="" method="POST">
+                                    <input type="hidden" name="form_data" id="form_data">
+                                    <button type="submit" class="createform" onclick="createForm()">Create
+                                        Form</button>
+                                </form>
                             </div>
-                            <div class="col-5 box" id="form-area">
-                                <!-- Form fields will be dropped here -->
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-4 col-md-6">
-                                    <form id="dynamic-form" action="" method="POST">
-                                        <input type="hidden" name="form_data" id="form_data">
-                                        <button type="submit" class="createform" onclick="createForm()">Create
-                                            Form</button>
-                                    </form>
-                                </div>
-                            </div>
+                        </div>
                         <!-- </form> -->
                     </div>
                 </div>
