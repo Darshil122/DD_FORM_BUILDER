@@ -86,12 +86,13 @@
             }
             ?></span>
                     </div>
-                    <div class="input-group mb-2">
+                    <div class="input-group mb-2" id="show_hide_password">
                         <input type="password" class="form-control" placeholder="Password" name="password"
                             value="<?php if(isset($_POST['login'])){ echo $password; }  ?>">
                         <div class="input-group-append">
                             <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
+                                <a href="" class="decoration-none text-secondary"><i class="fa fa-eye-slash"
+                                        aria-hidden="true"></i></a>
                             </div>
                         </div>
                     </div>
@@ -138,5 +139,25 @@
 
 </body>
 <?php include "Include/script.php"; ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePassword = document.querySelector('#show_hide_password a');
+    const passwordField = document.querySelector('#show_hide_password input');
+    const passwordIcon = document.querySelector('#show_hide_password i');
+
+    togglePassword.addEventListener('click', function(event) {
+        event.preventDefault();
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            passwordIcon.classList.remove('fa-eye-slash');
+            passwordIcon.classList.add('fa-eye');
+        } else {
+            passwordField.type = 'password';
+            passwordIcon.classList.remove('fa-eye');
+            passwordIcon.classList.add('fa-eye-slash');
+        }
+    });
+});
+</script>
 
 </html>
