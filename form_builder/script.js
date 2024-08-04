@@ -77,12 +77,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function createFieldTemplate(label, inputHTML) {
     return `
-                    <div class="form-field dragg" draggable="true" style="grid-column: span 1;">
-                        <label class="form-label">${label}</label>
-                        ${inputHTML}
-                        <button class="toggle-width-btn" onclick="toggleFieldWidth(this)">Toggle Width</button>
-                    </div>
-                `;
+      <div class="form-field dragg" draggable="true" style="grid-column: span 1;">
+        <label class="form-label">${label}</label>
+        ${inputHTML}
+        <button class="toggle-width-btn" type="button" onclick="toggleFieldWidth(this)">Toggle Width</button>
+      </div>
+    `;
   }
 
   function getTextFieldHTML() {
@@ -117,15 +117,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return createFieldTemplate(
       "Radio Field",
       `
-                    <div class="radio-field">
-                        <input type="radio" name="radio" value="option1">
-                        <label>Option 1</label>
-                    </div>
-                    <div class="radio-field">
-                        <input type="radio" name="radio" value="option2">
-                        <label>Option 2</label>
-                    </div>
-                `
+        <div class="radio-field">
+          <input type="radio" name="radio" value="option1">
+          <label>Option 1</label>
+        </div>
+        <div class="radio-field">
+          <input type="radio" name="radio" value="option2">
+          <label>Option 2</label>
+        </div>
+      `
     );
   }
 
@@ -133,11 +133,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return createFieldTemplate(
       "Dropdown List",
       `
-                    <select class="form-control">
-                        <option value="1">Option 1</option>
-                        <option value="2">Option 2</option>
-                    </select>
-                `
+        <select class="form-control">
+          <option value="1">Option 1</option>
+          <option value="2">Option 2</option>
+        </select>
+      `
     );
   }
 
@@ -152,9 +152,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return createFieldTemplate(
       "Checkbox Field",
       `
-                    <input type="checkbox" value="1"> Checkbox 1<br>
-                    <input type="checkbox" value="2"> Checkbox 2
-                `
+        <input type="checkbox" value="1"> Checkbox 1<br>
+        <input type="checkbox" value="2"> Checkbox 2
+      `
     );
   }
 
@@ -193,7 +193,6 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const formNameInput = document.getElementById("formName");
-  // const formArea = document.getElementById('form-area');
   const formDataInput = document.getElementById("form_data");
 
   function createForm() {
@@ -204,9 +203,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const formFields = Array.from(formArea.children).map((field) => {
+      const inputElement = field.querySelector("input, textarea, select");
       return {
         label: field.querySelector("label").innerText,
-        type: field.querySelector("input, textarea").type,
+        type: inputElement.tagName.toLowerCase() === 'textarea' ? 'textarea' : inputElement.type,
+        name: inputElement.name || '',
+        options: inputElement.tagName.toLowerCase() === 'select' ? Array.from(inputElement.options).map(option => option.value) : null
       };
     });
 
@@ -215,7 +217,6 @@ document.addEventListener("DOMContentLoaded", () => {
       formData: formFields,
     });
 
-    // Fetch request to save form data
     fetch("FormController.php", {
       method: "POST",
       headers: {

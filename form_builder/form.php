@@ -1,7 +1,3 @@
-<?php 
-    include "./Include/style.php"; 
-    // include "./Include/header.php";
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Form List</title>
- 
+    <?php include "./Include/style.php"; ?>
 </head>
 
 <body class="hold-transition layout-fixed">
@@ -18,7 +14,6 @@
         <!-- header -->
         <?php include "./Include/header.php"; ?>
 
-        <!-- sidebar -->
 
         <section class="content">
             <div class="container-fluid">

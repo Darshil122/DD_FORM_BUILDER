@@ -73,7 +73,7 @@
                     <input type="time" name="time" id="time" disabled>
                 </li>
                 <hr>
-                <li class="draging nav-item" draggable="true" data-type="DateTime">
+                <li class="draging nav-item" draggable="true" data-type="datetime">
                     <label for="datetime">Date Time&nbsp;:</label>
                     <input type="datetime-local" name="datetime" id="datetime" disabled>
                 </li>
