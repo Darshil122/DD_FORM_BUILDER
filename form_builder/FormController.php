@@ -11,11 +11,11 @@ class FormController {
         $dbname = "form_builders";
 
         // Create connection
-        $this->conn = mysqli_connect($servername, $username, $password, $dbname);
+        $this->conn = new mysqli($servername, $username, $password, $dbname);
 
         // Check connection
-        if (!$this->conn) {
-            die("Connection failed: " . mysqli_connect_error());
+        if ($this->conn->connect_error) {
+            die("Connection failed: " . $this->conn->connect_error);
         }
     }
 
@@ -40,51 +40,63 @@ class FormController {
             return;
         }
 
+        // Insert form into forms_master
         $stmt = $this->conn->prepare("INSERT INTO forms_master (user_id, form_name) VALUES (?, ?)");
-        if ($stmt === false) {
-            echo json_encode(['success' => false, 'error' => 'Prepare failed: ' . $this->conn->error]);
+        $stmt->bind_param("is", $userId, $formName);
+        if (!$stmt->execute()) {
+            echo json_encode(['success' => false, 'error' => 'Form insert failed: ' . $stmt->error]);
             return;
         }
 
-        $stmt->bind_param("is", $userId, $formName);
+        // Get the inserted form ID
+        $formId = $stmt->insert_id;
+        $stmt->close();
 
-        if ($stmt->execute()) {
-            $formId = $stmt->insert_id;
-            $stmt->close();
+        // Insert form fields into formfields_master
+        foreach ($formData as $field) {
+            $fieldName = $field['label'];
+            $fieldType = $field['type'];
 
-            $stmtField = $this->conn->prepare("INSERT INTO formFields_master (form_id, field_name, field_type) VALUES (?, ?, ?)");
-            if ($stmtField === false) {
-                echo json_encode(['success' => false, 'error' => 'Prepare failed: ' . $this->conn->error]);
+            $stmtField = $this->conn->prepare("INSERT INTO formfields_master (form_id, field_name, field_type) VALUES (?, ?, ?)");
+            $stmtField->bind_param("iss", $formId, $fieldName, $fieldType);
+            if (!$stmtField->execute()) {
+                echo json_encode(['success' => false, 'error' => 'Field insert failed: ' . $stmtField->error]);
                 return;
             }
-
-            foreach ($formData as $field) {
-                $fieldName = $field['label'];
-                $fieldType = $field['type'];
-                $stmtField->bind_param("iss", $formId, $fieldName, $fieldType);
-
-                if (!$stmtField->execute()) {
-                    echo json_encode(['success' => false, 'error' => 'Execute failed: ' . $stmtField->error]);
-                    return;
-                }
-            }
-
-            $stmtField->close();
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Execute failed: ' . $stmt->error]);
         }
+
+        echo json_encode(['success' => true]);
     }
 
     public function displayForm($formId) {
-        $stmt = $this->conn->prepare("SELECT form_name FROM forms_master WHERE id = ?");
+        // Prepare the query
+        $query = "
+            SELECT f.form_name, ff.field_name, ff.field_type 
+            FROM forms_master f
+            LEFT JOIN formfields_master ff ON f.form_id = ff.form_id
+            WHERE f.form_id = ?
+        ";
+
+        $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $formId);
         $stmt->execute();
-        $stmt->bind_result($formName);
+        $stmt->bind_result($formName, $fieldName, $fieldType);
 
-        if ($stmt->fetch()) {
-            echo "<h1>$formName</h1>";
-        } else {
+        $formFields = [];
+        $formNameFetched = false;
+
+        // Fetch form name and fields
+        while ($stmt->fetch()) {
+            if (!$formNameFetched) {
+                echo "<h1>$formName</h1>";
+                $formNameFetched = true;
+            }
+            if ($fieldName) {
+                $formFields[] = ['fieldName' => $fieldName, 'fieldType' => $fieldType];
+            }
+        }
+
+        if (empty($formFields)) {
             echo "Form not found.";
             $stmt->close();
             return;
@@ -92,30 +104,23 @@ class FormController {
 
         $stmt->close();
 
-        $stmtFields = $this->conn->prepare("SELECT field_name, field_type FROM formFields_master WHERE form_id = ?");
-        $stmtFields->bind_param("i", $formId);
-        $stmtFields->execute();
-        $stmtFields->bind_result($fieldName, $fieldType);
-
+        // Display the form fields
         echo '<form>';
-        while ($stmtFields->fetch()) {
+        foreach ($formFields as $field) {
             echo "<div class='form-field'>";
-            echo "<label>$fieldName</label>";
-            if ($fieldType == 'textarea') {
-                echo "<textarea placeholder='$fieldName'></textarea>";
+            echo "<label>{$field['fieldName']}</label>";
+            if ($field['fieldType'] == 'textarea') {
+                echo "<textarea placeholder='{$field['fieldName']}'></textarea>";
             } else {
-                echo "<input type='$fieldType' placeholder='$fieldName'>";
+                echo "<input type='{$field['fieldType']}' placeholder='{$field['fieldName']}'>";
             }
             echo "</div>";
         }
         echo '</form>';
-
-        $stmtFields->close();
     }
 }
 
 // Example usage:
-// Assuming you have a form that posts JSON data to saveForm
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formController = new FormController();
     $formController->saveForm();
