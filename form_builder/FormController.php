@@ -1,5 +1,7 @@
 <?php
-session_start();
+if(session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 class FormController {
     private $conn;
@@ -23,8 +25,8 @@ class FormController {
         $this->conn->close();
     }
 
+    // CREATE - Save a new form
     public function saveForm() {
-        // Check if user is logged in
         if (!isset($_SESSION['id'])) {
             echo json_encode(['success' => false, 'error' => 'User not logged in.']);
             return;
@@ -33,59 +35,83 @@ class FormController {
         $data = json_decode(file_get_contents('php://input'), true);
         $formName = $data['formName'];
         $formData = $data['formData'];
-        $userId = $_SESSION['id'];  // Get user ID from session
+        $userId = $_SESSION['id'];  
 
         if (empty($formName) || empty($formData)) {
             echo json_encode(['success' => false, 'error' => 'Form name or data is empty.']);
             return;
         }
 
-        // Insert form into forms_master
-        $stmt = $this->conn->prepare("INSERT INTO forms_master (user_id, form_name) VALUES (?, ?)");
-        $stmt->bind_param("is", $userId, $formName);
-        if (!$stmt->execute()) {
-            echo json_encode(['success' => false, 'error' => 'Form insert failed: ' . $stmt->error]);
+        $this->conn->begin_transaction();
+        try {
+            $stmt = $this->conn->prepare("INSERT INTO forms_master (user_id, form_name, field_name, field_type, created_at) VALUES (?, ?, ?, ?, NOW())");
+            foreach ($formData as $field) {
+                $fieldName = $field['label'];
+                $fieldType = $field['type'];    
+
+                $stmt->bind_param("isss", $userId, $formName, $fieldName, $fieldType);
+                if (!$stmt->execute()) {
+                    throw new Exception('Form insert failed: ' . $stmt->error);
+                }
+            }
+            $this->conn->commit();
+            $stmt->close();
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            $this->conn->rollback();
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+    
+    // READ - Display a form
+    public function displayForm($formId) {
+        $userId = $_SESSION['id']; 
+        $sql = "SELECT * FROM forms_master WHERE user_id = '$userId'";
+        // $sql="SELECT * FROM forms_master where user_id = '$userId'";
+            $result = mysqli_query($this ->conn,$sql);
+            $id = mysqli_fetch_array($result);
+            if ($id>0) {
+                $_SESSION['id'] = $id[0];
+                $formId = $_SESSION['id'];
+            }
+            
+        if (!isset($userId)) {
+            echo "User not logged in.";
             return;
         }
-
-        // Get the inserted form ID
-        $formId = $stmt->insert_id;
-        $stmt->close();
-
-        // Insert form fields into formfields_master
-        foreach ($formData as $field) {
-            $fieldName = $field['label'];
-            $fieldType = $field['type'];
-
-            $stmtField = $this->conn->prepare("INSERT INTO formfields_master (form_id, field_name, field_type) VALUES (?, ?, ?)");
-            $stmtField->bind_param("iss", $formId, $fieldName, $fieldType);
-            if (!$stmtField->execute()) {
-                echo json_encode(['success' => false, 'error' => 'Field insert failed: ' . $stmtField->error]);
-                return;
-            }
-        }
-
-        echo json_encode(['success' => true]);
-    }
-
-    public function displayForm($formId) {
-        // Prepare the query
+    
+        // $userId = $_SESSION['id'];
+        
+        // Debugging code
+        echo "Form ID: " . htmlspecialchars($formId) . "<br>";
+        echo "User ID: " . htmlspecialchars($userId) . "<br>";
+    
+        
         $query = "
-            SELECT f.form_name, ff.field_name, ff.field_type 
-            FROM forms_master f
-            LEFT JOIN formfields_master ff ON f.form_id = ff.form_id
-            WHERE f.form_id = ?
-        ";
 
+             SELECT u.email, f.form_name, f.field_name, f.field_type
+            FROM user_master u
+            LEFT JOIN forms_master f ON u.id = f.user_id
+            WHERE u.id = ? AND f.user_id = ?
+            ";
+    
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $formId);
-        $stmt->execute();
+        if (!$stmt) {
+            echo "Error preparing statement: " . $this->conn->error;
+            return;
+        }
+    
+        $stmt->bind_param("ii", $formId, $userId );
+        if (!$stmt->execute()) {
+            echo "Error executing statement: " . $stmt->error;
+            return;
+        }
+    
         $stmt->bind_result($formName, $fieldName, $fieldType);
-
+    
         $formFields = [];
         $formNameFetched = false;
-
-        // Fetch form name and fields
+    
         while ($stmt->fetch()) {
             if (!$formNameFetched) {
                 echo "<h1>$formName</h1>";
@@ -95,34 +121,108 @@ class FormController {
                 $formFields[] = ['fieldName' => $fieldName, 'fieldType' => $fieldType];
             }
         }
-
+    
         if (empty($formFields)) {
             echo "Form not found.";
-            $stmt->close();
+        } else {
+            echo '<form>';
+            foreach ($formFields as $field) {
+                echo "<div class='form-field'>";
+                echo "<label>{$field['fieldName']}</label>";
+                if ($field['fieldType'] == 'textarea') {
+                    echo "<textarea placeholder='{$field['fieldName']}'></textarea>";
+                } else {
+                    echo "<input type='{$field['fieldType']}' placeholder='{$field['fieldName']}'>";
+                }
+                echo "</div>";
+            }
+            echo '</form>';
+        }
+    
+        $stmt->close();
+    }
+    
+    
+    // UPDATE - Update an existing form
+    public function updateForm($formId) {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $formName = $data['formName'];
+        $formData = $data['formData'];
+
+        if (empty($formName) || empty($formData)) {
+            echo json_encode(['success' => false, 'error' => 'Form name or data is empty.']);
             return;
         }
 
-        $stmt->close();
-
-        // Display the form fields
-        echo '<form>';
-        foreach ($formFields as $field) {
-            echo "<div class='form-field'>";
-            echo "<label>{$field['fieldName']}</label>";
-            if ($field['fieldType'] == 'textarea') {
-                echo "<textarea placeholder='{$field['fieldName']}'></textarea>";
-            } else {
-                echo "<input type='{$field['fieldType']}' placeholder='{$field['fieldName']}'>";
+        $this->conn->begin_transaction();
+        try {
+            // Delete existing fields
+            $stmt = $this->conn->prepare("DELETE FROM forms_master WHERE id = ?");
+            $stmt->bind_param("i", $formId);
+            if (!$stmt->execute()) {
+                throw new Exception('Form delete failed: ' . $stmt->error);
             }
-            echo "</div>";
+            $stmt->close();
+
+            // Insert updated fields
+            $stmt = $this->conn->prepare("INSERT INTO forms_master (user_id, form_name, field_name, field_type, created_at) VALUES (?, ?, ?, ?, NOW())");
+            $userId = $_SESSION['id'];
+            foreach ($formData as $field) {
+                $fieldName = $field['label'];
+                $fieldType = $field['type'];
+
+                $stmt->bind_param("isss", $userId, $formName, $fieldName, $fieldType);
+                if (!$stmt->execute()) {
+                    throw new Exception('Form update failed: ' . $stmt->error);
+                }
+            }
+            $this->conn->commit();
+            $stmt->close();
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            $this->conn->rollback();
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
-        echo '</form>';
+    }
+
+    // DELETE - Delete a form
+    public function deleteForm($formId) {
+        $stmt = $this->conn->prepare("DELETE FROM forms_master WHERE id = ?");
+        $stmt->bind_param("i", $formId);
+        if (!$stmt->execute()) {
+            echo json_encode(['success' => false, 'error' => 'Form delete failed: ' . $stmt->error]);
+            return;
+        }
+        $stmt->close();
+        echo json_encode(['success' => true]);
     }
 }
 
 // Example usage:
+// Handle POST request to save a form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formController = new FormController();
     $formController->saveForm();
+}
+
+// Handle PUT request to update a form
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    $formId = $_GET['id'] ?? 0; 
+    $formController = new FormController();
+    $formController->updateForm($formId);
+}
+
+// Handle DELETE request to delete a form
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    $formId = $_GET['id'] ?? 0; 
+    $formController = new FormController();
+    $formController->deleteForm($formId);
+}
+
+// Handle GET request to display a form
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $formId = $_GET['id'] ?? 0; 
+    $formController = new FormController();
+    $formController->displayForm($formId);
 }
 ?>

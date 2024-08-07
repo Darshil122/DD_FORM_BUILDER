@@ -1,14 +1,14 @@
 <?php
+// routes.php
+
 require 'FormController.php';
 
-$controller = new FormController();
+$formController = new FormController();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['action'] === 'saveForm') {
-    $controller->saveForm();
-} elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && $_GET['action'] === 'displayForm') {
-    $formId = $_GET['form_id'];
-    $controller->displayForm($formId);
+if (isset($formId) && $formId !== null) {
+    $formController->displayForm($formId); // Fetch and display the form based on the formID
 } else {
-    echo "Invalid action.";
+    echo "route page";
+    // echo "Form ID is not provided.";
 }
 ?>

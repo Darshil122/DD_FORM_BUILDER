@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Form List</title>
     <?php include "./Include/style.php"; ?>
+    <title>Form List</title>
 </head>
 
 <body class="hold-transition layout-fixed">
@@ -14,32 +14,43 @@
         <!-- header -->
         <?php include "./Include/header.php"; ?>
 
-
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
-                <?php
-                    // Example URL: routes.php?action=displayForm&form_id=1
-                    if (isset($_GET['form_id'])) {
-                        require 'routes.php';
-                    } else {
-                        echo "Form ID not provided.";
-                    }
-                ?>
-                    <!-- <div class="col-md-4 col-lg-5 formlist" id="form-area">
-                         Form fields will be dropped here 
-                    </div> -->
+                  <?php
+                        // require "../DB/config.php";
+                        // $userId = $_SESSION['id'];
+                        // $sql="SELECT * FROM forms_master where user_id = '$userId'";
 
+                            // $result = mysqli_query($con,$sql);
+
+                            // $rows = mysqli_num_rows($result);
+                            // $id = mysqli_fetch_assoc($result);
+                            // Get the form ID from the URL
+
+                            // if ($id>0) {
+                            $formId = $_SESSION['id']; 
+                            // $formId = $_SESSION['id']; // Sanitize input
+                            // echo $formId;
+                            // }
+
+                        // Debug output for formID
+                        if ($formId) {
+                            require 'routes.php'; // Ensure this file handles the form display based on formID
+                            // echo "Form ID is not set or invalid.";
+                        }
+                    ?>
                 </div>
             </div>
         </section>
-        <!-- footer -->
-        <div class="text-center p-2 foot ">
-        Copyright &copy; <strong>DD Form Builder</strong> 2024-25.
-        All rights reserved.
-        </div>
-    </div>
 
+        <!-- footer -->
+        <footer class="footer">
+            Copyright &copy; <strong>DD Form Builder</strong> 2024-25.
+            All rights reserved.
+        </footer>
+    </div>
 </body>
+<?php include "./Include/script.php"; ?>
 
 </html>

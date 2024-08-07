@@ -29,7 +29,7 @@
         <!-- <li class="nav-item d-none d-sm-inline-block">
             <a href="logout.php" class="nav-link">Logout</a>
         </li> -->
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown d-none d-sm-inline-block">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
                 <i class="fa-solid fa-user"></i>
