@@ -76,28 +76,33 @@ class FormController {
     
     // READ - Display a form
     public function displayForm($formId) {
-        $userId = $_SESSION['id'];
         if (!isset($_SESSION['id'])) {
             echo "User not logged in.";
             return;
         }
-        $qry = "SELECT * FROM formfield_master";
+    
+        $userId = $_SESSION['id'];
+        $qry = "SELECT * FROM forms_master";
         $res = mysqli_query($this->conn, $qry);
         if(!$res){
             echo "Error: " . $this->conn->error;
             return;
         }else{
             $row = mysqli_fetch_array($res);
-            $formId = $row['form_id'];
+            $formId = $row['id'];
                 // echo $formId;
                 // echo $userId;
         }
-        // Retrieve form details and fields for the logged-in user
+    
+        // Sanitize formId
+        $formId = intval($formId);
+    
+        // Query to fetch form details and associated fields
         $query = "
-
-           SELECT ff.id, ff.field_name, ff.field_type
-            FROM formfield_master ff
-            WHERE ff.form_id = ?
+            SELECT f.form_name, ff.field_name, ff.field_type
+            FROM forms_master f
+            LEFT JOIN formfield_master ff ON f.id = ff.form_id
+            WHERE f.user_id = ? AND f.id = ?
         ";
     
         $stmt = $this->conn->prepare($query);
@@ -106,7 +111,7 @@ class FormController {
             return;
         }
     
-        $stmt->bind_param("i", $formId);
+        $stmt->bind_param("ii", $userId, $formId);
         if (!$stmt->execute()) {
             echo "Error executing statement: " . $stmt->error;
             return;
@@ -127,8 +132,10 @@ class FormController {
             }
         }
     
-        if (empty($formFields)) {
-            echo "No forms found for this user.";
+        if (!$formNameFetched) {
+            echo "No form found with the provided ID.";
+        } else if (empty($formFields)) {
+            echo "No fields found for this form.";
         } else {
             echo '<form>';
             foreach ($formFields as $field) {
@@ -146,6 +153,7 @@ class FormController {
     
         $stmt->close();
     }
+    
 
     public function displayAllForms() {
         if (!isset($_SESSION['id'])) {

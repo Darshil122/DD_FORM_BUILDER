@@ -2,7 +2,7 @@
   $a=array();
   session_start();
 
-  include "inc/config.php";
+  include "../DB/config.php";
   if(isset($_POST['login'])){
     $email = mysqli_real_escape_string($con, $_POST['email']);
     $password =mysqli_real_escape_string($con, $_POST['password']);
@@ -24,7 +24,7 @@
     // }
 
     if(count($a) == 0){
-      $sql="SELECT * FROM login where email = '$email' && password='$password' ";
+      $sql="SELECT * FROM login_master where email = '$email' && password='$password' ";
       $result = mysqli_query($con,$sql);
 
       $rows = mysqli_num_rows($result);

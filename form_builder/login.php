@@ -49,7 +49,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Log in</title>
-  <link rel="icon" type="image/jpg" href="dist/img/logo.png">
+  <link rel="icon" type="image/jpg" href="dist/img/navicon.png">
 
 
   <?php include "Include/style.php"; ?>
