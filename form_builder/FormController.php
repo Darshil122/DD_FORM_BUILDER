@@ -85,9 +85,7 @@ class FormController {
         $query = "
             SELECT f.id, f.form_name
             FROM forms_master f
-            WHERE f.user_id = ?
-
-            
+            WHERE f.user_id = ? 
         ";
     
         $stmt = $this->conn->prepare($query);
@@ -104,13 +102,25 @@ class FormController {
     
         $stmt->bind_result($formId, $formName);
     
+        echo "<div class='container'>";
         echo '<h1>Your Forms</h1>';
-        echo '<ul>';
+        echo "<ul class='mt-1 row d-flex justify-content-center'>";
         while ($stmt->fetch()) {
-            echo "<li><a href='?id=$formId'>$formName</a></li>";
-            echo $formId;
+            echo "<li class='navbar-nav col-7'><button class='text-black mt-5 btn btn-light py-4'>
+            <div class='col'>
+                <li>
+            <a href='?id=$formId' class='float-left px-2 h5'>$formName</a>
+        </li>
+        <li class='float-right px-2'>
+            <i class='fas fa-eye'></i>&nbsp;&nbsp;<i class='fas fa-edit'></i>&nbsp;&nbsp;<i class='fas fa-trash'></i>
+        </li>
+        </div>
+            </button></li>";
+            // echo $formId;
         }        
         echo '</ul>';
+        echo '</div>';
+
     
         if ($stmt->num_rows === 0) {
             echo "No forms found.";

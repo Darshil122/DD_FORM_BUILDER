@@ -40,8 +40,8 @@
         </div>
 
         <!-- footer -->
-        <footer class="footer">
-            Copyright &copy; <strong>DD Form Builder</strong> 2024-25.
+        <footer class="footer fixed-bootom">
+            Copyright &copy;&nbsp;<strong>DD Form Builder</strong>&nbsp;2024-25.
             All rights reserved.
         </footer>
     </div>

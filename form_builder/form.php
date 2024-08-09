@@ -10,7 +10,7 @@
     <title>Form List</title>
 </head>
 
-<body class="hold-transition layout-fixed">
+<body class="hold-transition layout-fixed layout-footer-fixed">
     <div class="wrapper">
         <!-- header -->
         <?php include "./Include/header.php"; ?>
@@ -19,26 +19,10 @@
             <div class="container-fluid">
                 <div class="row">
                   <?php
-                        // require "../DB/config.php";
-                        // $userId = $_SESSION['id'];
-                        // $sql="SELECT * FROM forms_master where user_id = '$userId'";
-
-                            // $result = mysqli_query($con,$sql);
-
-                            // $rows = mysqli_num_rows($result);
-                            // $id = mysqli_fetch_assoc($result);
-                            // Get the form ID from the URL
-
-                            // if ($id>0) {
                             $formId = $_SESSION['id']; 
-                            // $formId = $_SESSION['id']; // Sanitize input
-                            // echo $formId;
-                            // }
 
-                        // Debug output for formID
                         if ($formId) {
-                            require 'FormController.php'; // Ensure this file handles the form display based on formID
-                            // echo "Form ID is not set or invalid.";
+                            require 'FormController.php'; 
                         }
                     ?>
                 </div>
@@ -46,8 +30,8 @@
         </section>
 
         <!-- footer -->
-        <footer class="footer">
-            Copyright &copy; <strong>DD Form Builder</strong> 2024-25.
+        <footer class="footer fixed-bootom">
+            Copyright &copy;&nbsp;<strong>DD Form Builder</strong>&nbsp;2024-25.
             All rights reserved.
         </footer>
     </div>

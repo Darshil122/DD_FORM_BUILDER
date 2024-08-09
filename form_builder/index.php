@@ -11,7 +11,7 @@
     <title>Form Builder</title>
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed layout-footer-fixed">
     <div class="wrapper">
         <!-- header -->
         <?php include "./Include/header.php"; ?>
@@ -48,7 +48,7 @@
         </div>
         <!-- footer -->
 
-        <footer class="main-footer" style="color:black; background-color: rgba(0, 0, 0, 0.2); padding-bottom:12px;">
+        <footer class="main-footer" style="color:black; background-color: rgba(0, 0, 0, 0.2);padding-bottom:12px;">
             Copyright &copy; <strong>DD Form Builder</strong> 2024-25.
             All rights reserved.
         </footer>
