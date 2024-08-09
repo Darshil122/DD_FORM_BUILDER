@@ -73,88 +73,6 @@ class FormController {
         }
     }
     
-    
-    // READ - Display a form
-    public function displayForm($formId) {
-        if (!isset($_SESSION['id'])) {
-            echo "User not logged in.";
-            return;
-        }
-    
-        $userId = $_SESSION['id'];
-        $qry = "SELECT * FROM forms_master";
-        $res = mysqli_query($this->conn, $qry);
-        if(!$res){
-            echo "Error: " . $this->conn->error;
-            return;
-        }else{
-            $row = mysqli_fetch_array($res);
-            $formId = $row['id'];
-                // echo $formId;
-                // echo $userId;
-        }
-    
-        // Sanitize formId
-        $formId = intval($formId);
-    
-        // Query to fetch form details and associated fields
-        $query = "
-            SELECT f.form_name, ff.field_name, ff.field_type
-            FROM forms_master f
-            LEFT JOIN formfield_master ff ON f.id = ff.form_id
-            WHERE f.user_id = ? AND f.id = ?
-        ";
-    
-        $stmt = $this->conn->prepare($query);
-        if (!$stmt) {
-            echo "Error preparing statement: " . $this->conn->error;
-            return;
-        }
-    
-        $stmt->bind_param("ii", $userId, $formId);
-        if (!$stmt->execute()) {
-            echo "Error executing statement: " . $stmt->error;
-            return;
-        }
-    
-        $stmt->bind_result($formName, $fieldName, $fieldType);
-    
-        $formFields = [];
-        $formNameFetched = false;
-    
-        while ($stmt->fetch()) {
-            if (!$formNameFetched) {
-                echo "<h1>$formName</h1>";
-                $formNameFetched = true;
-            }
-            if ($fieldName) {
-                $formFields[] = ['fieldName' => $fieldName, 'fieldType' => $fieldType];
-            }
-        }
-    
-        if (!$formNameFetched) {
-            echo "No form found with the provided ID.";
-        } else if (empty($formFields)) {
-            echo "No fields found for this form.";
-        } else {
-            echo '<form>';
-            foreach ($formFields as $field) {
-                echo "<div class='form-field'>";
-                echo "<label>{$field['fieldName']}</label>";
-                if ($field['fieldType'] == 'textarea') {
-                    echo "<textarea placeholder='{$field['fieldName']}'></textarea>";
-                } else {
-                    echo "<input type='{$field['fieldType']}' placeholder='{$field['fieldName']}'>";
-                }
-                echo "</div>";
-            }
-            echo '</form>';
-        }
-    
-        $stmt->close();
-    }
-    
-
     public function displayAllForms() {
         if (!isset($_SESSION['id'])) {
             echo "User not logged in.";
@@ -190,6 +108,7 @@ class FormController {
         echo '<ul>';
         while ($stmt->fetch()) {
             echo "<li><a href='?id=$formId'>$formName</a></li>";
+            echo $formId;
         }        
         echo '</ul>';
     
@@ -199,92 +118,59 @@ class FormController {
     
         $stmt->close();
     }
-    
-    
-    
-    
-    // UPDATE - Update an existing form
-    public function updateForm($formId) {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $formName = $data['formName'];
-        $formData = $data['formData'];
-    
-        if (empty($formName) || empty($formData)) {
-            echo json_encode(['success' => false, 'error' => 'Form name or data is empty.']);
-            return;
+    // READ - Display a form
+    public function displayForm($formId) {
+        $userId = $_SESSION['id'];
+        if (!$userId) {
+            echo "User not logged in.";
+            return; // Ensure no further code is executed if the user is not logged in
         }
-    
-        $this->conn->begin_transaction();
-        try {
-            // Update form name
-            $stmt = $this->conn->prepare("UPDATE forms_master SET form_name = ? WHERE id = ?");
-            $stmt->bind_param("si", $formName, $formId);
-            if (!$stmt->execute()) {
-                throw new Exception('Form update failed: ' . $stmt->error);
-            }
-            $stmt->close();
-    
-            // Delete old fields
-            $stmt = $this->conn->prepare("DELETE FROM formfield_master WHERE form_id = ?");
-            $stmt->bind_param("i", $formId);
-            if (!$stmt->execute()) {
-                throw new Exception('Form field delete failed: ' . $stmt->error);
-            }
-            $stmt->close();
-    
-            // Insert updated fields
-            $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, created_at) VALUES (?, ?, ?, NOW())");
-            foreach ($formData as $field) {
-                $fieldName = $field['label'];
-                $fieldType = $field['type'];
-    
-                $stmt->bind_param("iss", $formId, $fieldName, $fieldType);
-                if (!$stmt->execute()) {
-                    throw new Exception('Form field update failed: ' . $stmt->error);
+        
+        $ffqry = "SELECT field_name, field_type FROM formfield_master WHERE form_id = $formId";
+        $exc = mysqli_query($this->conn, $ffqry);
+        
+        if (!$exc) {
+            echo "Error executing query: " . mysqli_error($this->conn);
+            return; // Ensure no further code is executed if the query fails
+        }
+        
+        $formfield = [];
+        while ($row = mysqli_fetch_assoc($exc)) {
+            // Extract values from $row
+            $fieldName = $row['field_name'];
+            $fieldType = $row['field_type'];
+            
+            // Add the field information to the formfield array
+            $formfield[] = ['field_name' => $fieldName, 'field_type' => $fieldType];
+        }
+        
+        if (empty($formfield)) {
+            echo "Form not found.";
+        } else {
+            echo '<form>';
+            foreach ($formfield as $field) {
+                echo "<div class='form-group row mx-4 mt-3'>";
+                echo "<label>{$field['field_name']}:</label>";
+                if ($field['field_type'] == 'textarea') {
+                    echo "<textarea placeholder='{$field['field_name']}'></textarea>";
+                } else {
+                    echo "<input type='{$field['field_type']}' class='form-control' placeholder='{$field['field_name']}'>";
                 }
+                echo "</div>";
             }
-            $this->conn->commit();
-            $stmt->close();
-            echo json_encode(['success' => true]);
-        } catch (Exception $e) {
-            $this->conn->rollback();
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            echo '</form>';
         }
     }
+    
     
 
-    // DELETE - Delete a form
-    public function deleteForm($formId) {
-        $stmt = $this->conn->prepare("DELETE FROM forms_master WHERE id = ?");
-        $stmt->bind_param("i", $formId);
-        if (!$stmt->execute()) {
-            echo json_encode(['success' => false, 'error' => 'Form delete failed: ' . $stmt->error]);
-            return;
-        }
-        $stmt->close();
-        echo json_encode(['success' => true]);
-    }
+   
 }
 
-// Example usage:
 // Handle POST request to save a form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formController = new FormController();
     $formController->saveForm();
-}
-
-// Handle PUT request to update a form
-if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-    $formId = $_GET['id'] ?? 0; 
-    $formController = new FormController();
-    $formController->updateForm($formId);
-}
-
-// Handle DELETE request to delete a form
-if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    $formId = $_GET['id'] ?? 0; 
-    $formController = new FormController();
-    $formController->deleteForm($formId);
 }
 
 // Handle GET request to display a form
