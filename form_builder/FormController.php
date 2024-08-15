@@ -73,6 +73,7 @@ class FormController {
         }
     }
     
+    // display form name
     public function displayAllForms() {
         if (!isset($_SESSION['id'])) {
             echo "User not logged in.";
@@ -106,75 +107,88 @@ class FormController {
         echo '<h1>Your Forms</h1>';
         echo "<ul class='mt-1 row d-flex justify-content-center'>";
         while ($stmt->fetch()) {
-            echo "<li class='navbar-nav col-7'><button class='text-black mt-5 btn btn-light py-4'>
+            echo "<li class='navbar-nav col-7'><button class='mt-5 btn btn-light py-4'>
             <div class='col'>
                 <li>
-            <a href='?id=$formId' class='float-left px-2 h5'>$formName</a>
+            <p class='float-left px-2 h5'>$formName</p>
         </li>
         <li class='float-right px-2'>
-            <i class='fas fa-eye'></i>&nbsp;&nbsp;<i class='fas fa-edit'></i>&nbsp;&nbsp;<i class='fas fa-trash'></i>
+             <a href='?id=$formId'><i class='fas fa-eye'></i></a>&nbsp;&nbsp;<i class='fas fa-edit'></i>&nbsp;&nbsp;<i class='fas fa-trash'></i>
         </li>
         </div>
             </button></li>";
-            // echo $formId;
+            // $_SESSION['form_name'] = $formName;
         }        
         echo '</ul>';
         echo '</div>';
 
-    
         if ($stmt->num_rows === 0) {
             echo "No forms found.";
         }
     
         $stmt->close();
     }
-    // READ - Display a form
+    // Display a form
     public function displayForm($formId) {
         $userId = $_SESSION['id'];
         if (!$userId) {
             echo "User not logged in.";
-            return; // Ensure no further code is executed if the user is not logged in
+            return;
         }
+
+        $qry = "
+            SELECT fm.form_name, ff.field_name, ff.field_type 
+            FROM forms_master fm
+            JOIN formfield_master ff ON fm.id = ff.form_id
+            WHERE fm.id = $formId
+        ";
         
-        $ffqry = "SELECT field_name, field_type FROM formfield_master WHERE form_id = $formId";
-        $exc = mysqli_query($this->conn, $ffqry);
+        $exc = mysqli_query($this->conn, $qry);
         
         if (!$exc) {
             echo "Error executing query: " . mysqli_error($this->conn);
-            return; // Ensure no further code is executed if the query fails
+            return;
         }
         
         $formfield = [];
+        $formName = '';
+        
         while ($row = mysqli_fetch_assoc($exc)) {
-            // Extract values from $row
-            $fieldName = $row['field_name'];
-            $fieldType = $row['field_type'];
-            
-            // Add the field information to the formfield array
-            $formfield[] = ['field_name' => $fieldName, 'field_type' => $fieldType];
+
+            if (empty($formName)) {
+                $formName = $row['form_name'];
+            }
+  
+            $formfield[] = [
+                'field_name' => $row['field_name'],
+                'field_type' => $row['field_type']
+            ];
         }
         
         if (empty($formfield)) {
             echo "Form not found.";
         } else {
-            echo '<form>';
+            echo "<div class='container'>
+                    <div class = 'row justify-content-center'>";
+            echo "<h1 class = 'mt-4'>{$formName}</h1>
+                    </div>";
+            echo "<form class = 'row justify-content-center'>";
             foreach ($formfield as $field) {
-                echo "<div class='form-group row mx-4 mt-3'>";
+                echo "<div class='col-6 form-group mx-4 mt-3'>";
                 echo "<label>{$field['field_name']}:</label>";
                 if ($field['field_type'] == 'textarea') {
-                    echo "<textarea placeholder='{$field['field_name']}'></textarea>";
+                    echo "<textarea class='form-control' cols = '15' rows = '4' placeholder='{$field['field_name']}'></textarea>";
                 } else {
                     echo "<input type='{$field['field_type']}' class='form-control' placeholder='{$field['field_name']}'>";
                 }
                 echo "</div>";
             }
-            echo '</form>';
+            echo '</form>
+                </div>';
+
         }
     }
     
-    
-
-   
 }
 
 // Handle POST request to save a form
