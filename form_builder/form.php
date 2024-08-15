@@ -37,5 +37,39 @@
     </div>
 </body>
 <?php include "./Include/script.php"; ?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    var formIdToDelete = null;
+
+    // When a delete button is clicked, set the formIdToDelete
+    $('.delete-form').on('click', function() {
+        formIdToDelete = $(this).data('id');
+    });
+
+    // When the confirm delete button is clicked in the modal
+    $('#confirmDeleteBtn').on('click', function() {
+        if (formIdToDelete !== null) {
+            $.ajax({
+                url: 'FormCOntroller.php', // Adjust this path
+                type: 'DELETE',
+                data: { id: formIdToDelete },
+                success: function(response) {
+                    var result = JSON.parse(response);
+                    if (result.success) {
+                        // Optionally, remove the form from the page or reload the list
+                        location.reload(); // or remove the form element manually
+                    } else {
+                        alert('Failed to delete form: ' + result.error);
+                    }
+                },
+                error: function() {
+                    alert('Error deleting form.');
+                }
+            });
+        }
+    });
+});
+</script>
 
 </html>

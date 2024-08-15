@@ -107,11 +107,10 @@ class FormController {
                 <li>
             <p class='float-left px-2 h5'>$formName</p>
         </li>
-        <li class='float-right px-2'>
-             <a href='?id=$formId'><i class='fas fa-eye'></i></a>&nbsp;&nbsp;
-             <a href='?id=$formId'><i class='fas fa-edit'></i></a>&nbsp;&nbsp;
-             <a href='?id=$formId'><i class='fas fa-trash'></i></a>
-        </li>
+         <li class='float-right px-2'>
+                <a href='?id=$formId'><i class='fas fa-eye'></i></a>&nbsp;&nbsp;<i class='fas fa-edit'></i>
+                <a class='btn delete-form' data-id='$formId' data-toggle='modal' data-target='#confirmDeleteModal'><i class='fas fa-trash'></i></a>
+            </li>
         </div>
             </button></li>";
         }        
@@ -123,6 +122,28 @@ class FormController {
         }
     
         $stmt->close();
+
+        echo '
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to delete this form?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        ';
     }
     // Display a form
     public function displayForm($formId) {
@@ -180,6 +201,34 @@ class FormController {
 
         }
     }
+
+    public function deleteForm($formId) {
+        if (!isset($_SESSION['id'])) {
+            echo json_encode(['success' => false, 'error' => 'User not logged in.']);
+            return;
+        }
+
+        $userId = $_SESSION['id'];
+
+        // Delete form fields
+        $stmt = $this->conn->prepare("DELETE FROM formfield_master WHERE form_id = ?");
+        $stmt->bind_param("i", $formId);
+        if (!$stmt->execute()) {
+            echo json_encode(['success' => false, 'error' => 'Failed to delete form fields.']);
+            return;
+        }
+        $stmt->close();
+
+        // Delete the form
+        $stmt = $this->conn->prepare("DELETE FROM forms_master WHERE id = ? AND user_id = ?");
+        $stmt->bind_param("ii", $formId, $userId);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Failed to delete form.']);
+        }
+        $stmt->close();
+    }
 }
 
 // Handle POST request to save a form
@@ -188,16 +237,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formController->saveForm();
 }
 
-// Handle PUT request to update a form
-if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-    $formId = $_GET['id'] ?? 0; 
-    $formController = new FormController();
-    $formController->updateForm($formId);
-}
-
 // Handle DELETE request to delete a form
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    $formId = $_GET['id'] ?? 0; 
+    parse_str(file_get_contents("php://input"), $data);
+    $formId = $data['id'] ?? 0; 
     $formController = new FormController();
     $formController->deleteForm($formId);
 }
