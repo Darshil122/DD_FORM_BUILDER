@@ -15,7 +15,6 @@ class FormController {
         // Create connection
         $this->conn = new mysqli($servername, $username, $password, $dbname);
 
-        // Check connection
         if ($this->conn->connect_error) {
             die("Connection failed: " . $this->conn->connect_error);
         }
@@ -25,7 +24,7 @@ class FormController {
         $this->conn->close();
     }
 
-    // CREATE - Save a new form
+    // CREATE new form
     public function saveForm() {
         if (!isset($_SESSION['id'])) {
             echo json_encode(['success' => false, 'error' => 'User not logged in.']);
@@ -44,7 +43,7 @@ class FormController {
     
         $this->conn->begin_transaction();
         try {
-            // Insert form
+            // Insert form_master
             $stmt = $this->conn->prepare("INSERT INTO forms_master (user_id, form_name, created_at) VALUES (?, ?, NOW())");
             $stmt->bind_param("is", $userId, $formName);
             if (!$stmt->execute()) {
@@ -53,7 +52,7 @@ class FormController {
             $formId = $stmt->insert_id;
             $stmt->close();
     
-            // Insert form fields
+            // Insert formfields_master
             $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, created_at) VALUES (?, ?, ?, NOW())");
             foreach ($formData as $field) {
                 $fieldName = $field['label'];
@@ -83,11 +82,7 @@ class FormController {
         $userId = $_SESSION['id'];
     
         // Get all forms for the logged-in user
-        $query = "
-            SELECT f.id, f.form_name
-            FROM forms_master f
-            WHERE f.user_id = ? 
-        ";
+        $query = "SELECT f.id, f.form_name FROM forms_master f WHERE f.user_id = ?";
     
         $stmt = $this->conn->prepare($query);
         if (!$stmt) {
@@ -113,11 +108,12 @@ class FormController {
             <p class='float-left px-2 h5'>$formName</p>
         </li>
         <li class='float-right px-2'>
-             <a href='?id=$formId'><i class='fas fa-eye'></i></a>&nbsp;&nbsp;<i class='fas fa-edit'></i>&nbsp;&nbsp;<i class='fas fa-trash'></i>
+             <a href='?id=$formId'><i class='fas fa-eye'></i></a>&nbsp;&nbsp;
+             <a href='?id=$formId'><i class='fas fa-edit'></i></a>&nbsp;&nbsp;
+             <a href='?id=$formId'><i class='fas fa-trash'></i></a>
         </li>
         </div>
             </button></li>";
-            // $_SESSION['form_name'] = $formName;
         }        
         echo '</ul>';
         echo '</div>';
@@ -136,12 +132,8 @@ class FormController {
             return;
         }
 
-        $qry = "
-            SELECT fm.form_name, ff.field_name, ff.field_type 
-            FROM forms_master fm
-            JOIN formfield_master ff ON fm.id = ff.form_id
-            WHERE fm.id = $formId
-        ";
+        $qry = "SELECT fm.form_name, ff.field_name, ff.field_type FROM forms_master
+            fm JOIN formfield_master ff ON fm.id = ff.form_id WHERE fm.id = $formId";
         
         $exc = mysqli_query($this->conn, $qry);
         
@@ -188,7 +180,6 @@ class FormController {
 
         }
     }
-    
 }
 
 // Handle POST request to save a form
@@ -197,15 +188,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formController->saveForm();
 }
 
+// Handle PUT request to update a form
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    $formId = $_GET['id'] ?? 0; 
+    $formController = new FormController();
+    $formController->updateForm($formId);
+}
+
+// Handle DELETE request to delete a form
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    $formId = $_GET['id'] ?? 0; 
+    $formController = new FormController();
+    $formController->deleteForm($formId);
+}
+
 // Handle GET request to display a form
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $formController = new FormController();
 
     if (!isset($_GET['id'])) {
-        // display all forms for the logged-in user
         $formController->displayAllForms();
     } else {
-        // If a specific form ID is provided, display that form
         $formId = intval($_GET['id']);
         $formController->displayForm($formId);
     }
