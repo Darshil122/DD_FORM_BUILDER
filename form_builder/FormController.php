@@ -108,17 +108,18 @@ class FormController {
             <p class='float-left px-2 h5'>$formName</p>
         </li>
          <li class='float-right px-2'>
-                <a href='?id=$formId'><i class='fas fa-eye'></i></a>&nbsp;&nbsp;<i class='fas fa-edit'></i>
+                <a href='?id=$formId' class='btn' data-id='$formId'><i class='fas fa-eye'></i></a>&nbsp;&nbsp;<i class='fas fa-edit'></i>
                 <a class='btn delete-form' data-id='$formId' data-toggle='modal' data-target='#confirmDeleteModal'><i class='fas fa-trash'></i></a>
             </li>
         </div>
             </button></li>";
         }        
-        echo '</ul>';
-        echo '</div>';
+
 
         if ($stmt->num_rows === 0) {
-            echo "No forms found.";
+            echo "<h2>Form Banay Pela.</h2>";
+            echo '</ul>';
+            echo '</div>';
         }
     
         $stmt->close();
@@ -156,9 +157,9 @@ class FormController {
         $qry = "SELECT fm.form_name, ff.field_name, ff.field_type FROM forms_master
             fm JOIN formfield_master ff ON fm.id = ff.form_id WHERE fm.id = $formId";
         
-        $exc = mysqli_query($this->conn, $qry);
+        $res = mysqli_query($this->conn, $qry);
         
-        if (!$exc) {
+        if (!$res) {
             echo "Error executing query: " . mysqli_error($this->conn);
             return;
         }
@@ -166,7 +167,7 @@ class FormController {
         $formfield = [];
         $formName = '';
         
-        while ($row = mysqli_fetch_assoc($exc)) {
+        while ($row = mysqli_fetch_assoc($res)) {
 
             if (empty($formName)) {
                 $formName = $row['form_name'];
@@ -179,7 +180,7 @@ class FormController {
         }
         
         if (empty($formfield)) {
-            echo "Form not found.";
+            echo "No form found.";
         } else {
             echo "<div class='container'>
                     <div class = 'row justify-content-center'>";

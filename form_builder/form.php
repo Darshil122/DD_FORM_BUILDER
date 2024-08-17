@@ -19,7 +19,7 @@
             <div class="container-fluid">
                 <div class="row">
                   <?php
-                            $formId = $_SESSION['id']; 
+                        $formId = $_SESSION['id']; 
 
                         if ($formId) {
                             require 'FormController.php'; 
@@ -39,26 +39,23 @@
 <?php include "./Include/script.php"; ?>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
     var formIdToDelete = null;
 
-    // When a delete button is clicked, set the formIdToDelete
     $('.delete-form').on('click', function() {
         formIdToDelete = $(this).data('id');
     });
 
-    // When the confirm delete button is clicked in the modal
     $('#confirmDeleteBtn').on('click', function() {
         if (formIdToDelete !== null) {
             $.ajax({
-                url: 'FormCOntroller.php', // Adjust this path
+                url: 'FormCOntroller.php',
                 type: 'DELETE',
                 data: { id: formIdToDelete },
                 success: function(response) {
                     var result = JSON.parse(response);
                     if (result.success) {
-                        // Optionally, remove the form from the page or reload the list
-                        location.reload(); // or remove the form element manually
+                        location.reload();
                     } else {
                         alert('Failed to delete form: ' + result.error);
                     }

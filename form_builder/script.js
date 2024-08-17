@@ -249,33 +249,4 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
       createForm();
     });
-    $(document).ready(function () {
-      var formIdToDelete;
-    
-      // Show modal when delete button is clicked
-      $(".delete-form").on("click", function () {
-        formIdToDelete = $(this).data("id");
-        $("#confirmDeleteModal").modal("show");
-      });
-    
-      // Confirm deletion
-      $("#confirmDeleteBtn").on("click", function () {
-        $.ajax({
-          url: "FormController.php",
-          type: "DELETE",
-          data: { id: formIdToDelete },
-          success: function (response) {
-            if (response.success) {
-              // Reload the page to reflect the changes
-              location.reload();
-            } else {
-              alert("Error deleting form: " + response.error);
-            }
-          },
-          error: function () {
-            alert("An error occurred while trying to delete the form.");
-          },
-        });
-      });
-    });
 });
