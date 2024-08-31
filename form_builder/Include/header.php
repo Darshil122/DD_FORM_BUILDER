@@ -6,7 +6,7 @@
         header("Location: login.php");
     }
 ?>
-<nav class="main-header navbar navbar-expand navbar-white navbar-light p-0" style="margin-left:0px;">
+
     <a href="./index.php">
         <img src="dist/img/logo.png" alt="FormBuilder" height="60px" width="200px">
     </a>
@@ -45,4 +45,3 @@
             </ul>
         </li>
     </ul>
-</nav>

@@ -98,11 +98,11 @@ class FormController {
     
         $stmt->bind_result($formId, $formName);
     
-        echo "<div class='container'>";
-        echo '<h1>Your Forms</h1>';
-        echo "<ul class='mt-1 row d-flex justify-content-center'>";
+        echo "<div class='container'>
+                <h1 style='margin-top:70px;'>Form List</h1>";
+        echo "<ul class='mb-5 row d-flex justify-content-center'>";
         while ($stmt->fetch()) {
-            echo "<li class='navbar-nav col-7'><button class='mt-5 btn btn-light py-4'>
+            echo "<li class='navbar-nav col-lg-7'><button class='mt-5 btn btn-light py-4'>
             <div class='col'>
                 <li>
             <p class='float-left px-2 h5'>$formName</p>
@@ -184,7 +184,7 @@ class FormController {
         } else {
             echo "<div class='container'>
                     <div class = 'row justify-content-center'>";
-            echo "<h1 class = 'mt-4'>{$formName}</h1>
+            echo "<h1 class = 'mt'>{$formName}</h1>
                     </div>";
             echo "<form class = 'row justify-content-center'>";
             foreach ($formfield as $field) {

@@ -13,13 +13,15 @@
 <body class="hold-transition layout-fixed layout-footer-fixed">
     <div class="wrapper">
         <!-- header -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light fixed-top p-0 ml-0">
         <?php include "./Include/header.php"; ?>
+        </nav>
 
         <section class="content">
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row">
                   <?php
-                        $formId = $_SESSION['id']; 
+                        $formId = $_SESSION['id'];
 
                         if ($formId) {
                             require 'FormController.php'; 
@@ -30,10 +32,10 @@
         </section>
 
         <!-- footer -->
-        <footer class="footer fixed-bootom">
-            Copyright &copy;&nbsp;<strong>DD Form Builder</strong>&nbsp;2024-25.
-            All rights reserved.
-        </footer>
+        <footer class="p-3 fs-large d-flex justify-content-center bg-secondary fixed-bottom" style="margin-top:0vh;">
+        Copyright &copy;<strong>DD Form Builder</strong>2024-25.
+        All rights reserved.
+    </footer>
     </div>
 </body>
 <?php include "./Include/script.php"; ?>
