@@ -53,12 +53,13 @@ class FormController {
             $stmt->close();
     
             // Insert formfields_master
-            $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, created_at) VALUES (?, ?, ?, NOW())");
+            $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, options, created_at) VALUES (?, ?, ?, ?, NOW())");
             foreach ($formData as $field) {
                 $fieldName = $field['label'];
                 $fieldType = $field['type'];
+                $options = isset($field['options']) ? implode(',', $field['options']) : null; // Convert options array to comma-separated string
     
-                $stmt->bind_param("iss", $formId, $fieldName, $fieldType);
+                $stmt->bind_param("isss", $formId, $fieldName, $fieldType, $options);
                 if (!$stmt->execute()) {
                     throw new Exception('Form field insert failed: ' . $stmt->error);
                 }
@@ -71,6 +72,7 @@ class FormController {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+    
     
     // display form name
     public function displayAllForms() {
@@ -100,7 +102,7 @@ class FormController {
     
         echo "<div class='container'>
                 <h1 style='margin-top:70px;'>Form List</h1>";
-        echo "<ul class='mb-5 row d-flex justify-content-center'>";
+        echo "<ul class='mb row d-flex justify-content-center'>";
         while ($stmt->fetch()) {
             echo "<li class='navbar-nav col-lg-7'><button class='mt-5 btn btn-light py-4'>
             <div class='col'>
@@ -183,23 +185,34 @@ class FormController {
             echo "No form found.";
         } else {
             echo "<div class='container'>
-                    <div class = 'row justify-content-center'>";
-            echo "<h1 class = 'mt'>{$formName}</h1>
+                    <div class='row justify-content-center'>
+                    <h1 class='mt-3'>{$formName}</h1>
                     </div>";
-            echo "<form class = 'row justify-content-center'>";
+            echo "<form class='row justify-content-center'>";
+            
             foreach ($formfield as $field) {
                 echo "<div class='col-6 form-group mx-4 mt-3'>";
-                echo "<label>{$field['field_name']}:</label>";
-                if ($field['field_type'] == 'textarea') {
-                    echo "<textarea class='form-control' cols = '15' rows = '4' placeholder='{$field['field_name']}'></textarea>";
-                } else {
-                    echo "<input type='{$field['field_type']}' class='form-control' placeholder='{$field['field_name']}'>";
+                echo "<label for='{$field['field_name']}'>{$field['field_name']}:</label>";
+                
+                switch ($field['field_type']) {
+                    case 'textarea':
+                        echo "<textarea class='form-control' cols='15' rows='4' placeholder='{$field['field_name']}'></textarea>";
+                        break;
+                    case 'radio':
+                        echo "<br><input type='radio' name='{$field['field_name']}' value='Option 1'> Option 1<br>";
+                        echo "<input type='radio' name='{$field['field_name']}' value='Option 2'> Option 2";
+                        break;
+                    case 'checkbox':
+                        echo "<br><input type='checkbox' name='{$field['field_name']}' value='Option 1'> Option 1<br>";
+                        echo "<input type='checkbox' name='{$field['field_name']}' value='Option 2'> Option 2";
+                        break;
+                    default:
+                        echo "<input type='{$field['field_type']}' class='form-control' placeholder='{$field['field_name']}'>";
+                        break;
                 }
                 echo "</div>";
             }
-            echo '</form>
-                </div>';
-
+            echo "</form></div>";
         }
     }
 

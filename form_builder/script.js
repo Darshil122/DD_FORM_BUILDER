@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   formArea.addEventListener("dragover", handleDragOver);
   formArea.addEventListener("drop", handleDrop);
 
+  // Initialize sortable for drag and drop reordering
   new Sortable(formArea, {
     animation: 150,
     ghostClass: "sortable-ghost",
@@ -19,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function handleDragOver(event) {
-    event.preventDefault();
+    event.preventDefault(); // Allow drop by preventing the default behavior
   }
 
   function handleDrop(event) {
@@ -72,19 +73,23 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Unknown field type:", fieldType);
     }
 
+    // Insert the HTML into the form area
     formArea.insertAdjacentHTML("beforeend", fieldHTML);
   }
 
+  // Helper function to create a field template
   function createFieldTemplate(label, inputHTML) {
     return `
       <div class="form-field dragg" draggable="true" style="grid-column: span 1;">
-        <label class="form-label">${label}</label>
+        <label class="form-label">
+          <input type="text" class="label-input" value="${label}">
+        </label>
         ${inputHTML}
-        <button class="toggle-width-btn" type="button" onclick="toggleFieldWidth(this)">Toggle Width</button>
       </div>
     `;
   }
 
+  // HTML generation functions for different field types
   function getTextFieldHTML() {
     return createFieldTemplate(
       "Text Field",
@@ -186,6 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
+  // Toggle the width of a form field between full and half-width
   window.toggleFieldWidth = function (button) {
     const field = button.parentElement;
     const currentSpan = field.style.gridColumn;
@@ -204,8 +210,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formFields = Array.from(formArea.children).map((field) => {
       const inputElement = field.querySelector("input, textarea, select");
+      const labelElement = field.querySelector(".label-input");
+
       return {
-        label: field.querySelector("label").innerText,
+        label: labelElement ? labelElement.value : "",
         type:
           inputElement.tagName.toLowerCase() === "textarea"
             ? "textarea"
