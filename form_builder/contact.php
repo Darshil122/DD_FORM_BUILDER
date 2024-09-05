@@ -49,7 +49,7 @@
                         </div>
                         <div class="col-lg-5">
                             <div class="opening-table p-4 mt-1" style="background-color: #f5f5f5">
-                                <form action="" method="post">
+                                <form method="post">
                                     <div class="row">
                                         <h1 class="font-weight-bold mb-4">Send Message</h1>
                                         <div class="col-12 mb-4">
@@ -67,7 +67,7 @@
                                             <textarea name="msg" id="msg" class="form-control"></textarea>
                                         </div>
                                         <div class="col-6">
-                                            <button type="submit" class="px-4 btn btn-info">Submit</button>
+                                            <button type="submit" class="px-4 btn btn-info" onclick = "feedback()">Submit</button>
                                         </div>
                                     </div>
                                 </form>

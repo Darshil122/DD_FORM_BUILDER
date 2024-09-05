@@ -257,4 +257,42 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
       createForm();
     });
+
+  //feedback form
+  // document
+  //   .getElementById("contactForm")
+  //   .addEventListener("submit", function (event) {
+  //     event.preventDefault();
+  // function feedback(){
+  //     const feedbackData = {
+  //       name: document.getElementById("name").value,
+  //       email: document.getElementById("email").value,
+  //       msg: document.getElementById("msg").value,
+  //     };
+
+  //     fetch("FormController.php", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(feedbackData),
+  //     })
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         if (data.success) {
+  //           alert("Form submitted successfully!");
+  //         } else {
+  //           alert("Error: " + data.error);
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error:", error);
+  //       });
+  //   }
+  //   document
+  //   .getElementById("dynamic-form")
+  //   .addEventListener("submit", (event) => {
+  //     event.preventDefault();
+  //     feedback();
+  //   });
 });

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 08, 2024 at 08:12 PM
+-- Generation Time: Sep 05, 2024 at 08:55 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,6 +24,19 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `feedback_master`
+--
+
+CREATE TABLE `feedback_master` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `message` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `formfield_master`
 --
 
@@ -32,17 +45,16 @@ CREATE TABLE `formfield_master` (
   `form_id` int(11) DEFAULT NULL,
   `field_name` varchar(255) DEFAULT NULL,
   `field_type` varchar(50) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `options` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `formfield_master`
 --
 
-INSERT INTO `formfield_master` (`id`, `form_id`, `field_name`, `field_type`, `created_at`) VALUES
-(1, 1, 'Text Field', 'text', '2024-08-08 03:51:09'),
-(2, 2, 'Number Field', 'number', '2024-08-08 04:01:31'),
-(3, 3, 'Email Field', 'email', '2024-08-08 04:38:20');
+INSERT INTO `formfield_master` (`id`, `form_id`, `field_name`, `field_type`, `created_at`, `options`) VALUES
+(1, 88, 'Text Field', 'text', '2024-09-05 18:54:29', NULL);
 
 -- --------------------------------------------------------
 
@@ -62,9 +74,7 @@ CREATE TABLE `forms_master` (
 --
 
 INSERT INTO `forms_master` (`id`, `user_id`, `form_name`, `created_at`) VALUES
-(1, 3, 'jay form', '2024-08-08 03:51:09'),
-(2, 3, 'jay second form', '2024-08-08 04:01:31'),
-(3, 2, 'jaydev form', '2024-08-08 04:38:20');
+(88, 1, 'hello', '2024-09-05 18:54:29');
 
 -- --------------------------------------------------------
 
@@ -111,6 +121,12 @@ INSERT INTO `user_master` (`id`, `email`, `password`) VALUES
 --
 
 --
+-- Indexes for table `feedback_master`
+--
+ALTER TABLE `feedback_master`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `formfield_master`
 --
 ALTER TABLE `formfield_master`
@@ -143,16 +159,22 @@ ALTER TABLE `user_master`
 --
 
 --
+-- AUTO_INCREMENT for table `feedback_master`
+--
+ALTER TABLE `feedback_master`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `formfield_master`
 --
 ALTER TABLE `formfield_master`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `forms_master`
 --
 ALTER TABLE `forms_master`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
 -- AUTO_INCREMENT for table `login_master`

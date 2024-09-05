@@ -26,7 +26,6 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
-                        <!-- <form id="dynamic-form" action="routes.php?action=saveForm" method="POST"> -->
                         <div class="col-12 justify-content-center">
                             <input type="text" name="formName" id="formName" class="form-control"
                                 placeholder="Enter Form Name">
@@ -43,13 +42,12 @@
                                 </form>
                             </div>
                         </div>
-                        <!-- </form> -->
                     </div>
                 </div>
             </section>
         </div>
-        <!-- footer -->
 
+        <!-- footer -->
         <footer class="main-footer bg-secondary pt-3 pb-2">
             Copyright &copy; <strong>DD Form Builder</strong> 2024-25.
             All rights reserved.

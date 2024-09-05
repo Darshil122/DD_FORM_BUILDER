@@ -24,7 +24,7 @@ class FormController {
         $this->conn->close();
     }
 
-    // CREATE new form
+    // CREATE form
     public function saveForm() {
         if (!isset($_SESSION['id'])) {
             echo json_encode(['success' => false, 'error' => 'User not logged in.']);
@@ -43,7 +43,6 @@ class FormController {
     
         $this->conn->begin_transaction();
         try {
-            // Insert form_master
             $stmt = $this->conn->prepare("INSERT INTO forms_master (user_id, form_name, created_at) VALUES (?, ?, NOW())");
             $stmt->bind_param("is", $userId, $formName);
             if (!$stmt->execute()) {
@@ -51,8 +50,7 @@ class FormController {
             }
             $formId = $stmt->insert_id;
             $stmt->close();
-    
-            // Insert formfields_master
+
             $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, options, created_at) VALUES (?, ?, ?, ?, NOW())");
             foreach ($formData as $field) {
                 $fieldName = $field['label'];
@@ -83,7 +81,6 @@ class FormController {
     
         $userId = $_SESSION['id'];
     
-        // Get all forms for the logged-in user
         $query = "SELECT f.id, f.form_name FROM forms_master f WHERE f.user_id = ?";
     
         $stmt = $this->conn->prepare($query);
@@ -131,7 +128,7 @@ class FormController {
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Delete Form</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
@@ -185,10 +182,10 @@ class FormController {
             echo "No form found.";
         } else {
             echo "<div class='container'>
-                    <div class='row justify-content-center'>
-                    <h1 class='mt-3'>{$formName}</h1>
+                    <div class='mt-5 row justify-content-center'>
+                    <h1 class='mt-4'>{$formName}</h1>
                     </div>";
-            echo "<form class='row justify-content-center'>";
+            echo "<form class='row justify-content-center mb-5'>";
             
             foreach ($formfield as $field) {
                 echo "<div class='col-6 form-group mx-4 mt-3'>";
