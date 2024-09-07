@@ -13,65 +13,64 @@
 <body>
     <div class="wrapper">
         <!-- header -->
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light p-0 ml-0">
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light p-0 ml-0 fixed-top">
             <?php include "./Include/header.php"; ?>
             </nav>
 
         <section id="content">
             <div class="content-wrap">
                 <div class="container-fluid">
-                    <div class="row mt-auto p-2 justify-content-center bg-info">
-                        <div class="col-lg-12">
+                    <div class="row mt-auto p-1 pt-5 justify-content-center bg-info">
+                        <div class="col-lg-12 pt-4">
                             <h2 class="text-center">Contact Us</h2>
                         </div>
                     </div>
                 </div>
                 <div class="container">
                     <div class="row mt-5">
-                        <div class="col-lg-7">
-                            <div class="row ml-5">
+                        <div class="col-lg-6 mt-5">
+                            <div class="row ml-5">  
                                 <div class="col-10">
                                     <h2 class="font-weight-bold"><i class="fas fa-map-pin"></i>&nbsp;&nbsp;Address</h2>
                                     <p class="ml-5">Harivandana College, <br>
                                         Near Saurashtra University campus, <br>Munjaka, Rajkot, Gujrat, 360005.</p>
                                 </div>
                                 <div class="w-100"></div>
-                                <div class="col-10 mt-3">
+                                <div class="col-10 mt-4">
                                     <h2 class="font-weight-bold"><i class="fas fa-phone-alt"></i>&nbsp;&nbsp;Phone</h2>
                                     <p class="ml-5">&nbsp;&nbsp;+91 9499835771</p>
                                 </div>
                                 <div class="w-100"></div>
-                                <div class="col-10 mt-3">
+                                <div class="col-10 mt-4">
                                     <h2 class="font-weight-bold"><i class="fas fa-envelope-open"></i>&nbsp;&nbsp;Email</h2>
                                     <p class="ml-5">ddformbuilder@gmail.com</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-5">
-                            <div class="opening-table p-4 mt-1" style="background-color: #f5f5f5">
-                                <form method="post">
+                            <div class="opening-table p-3" style="background-color: #f5f5f5">
+                                <form method="post" id="fbmsg">
                                     <div class="row">
                                         <h1 class="font-weight-bold mb-4">Send Message</h1>
-                                        <div class="col-12 mb-4">
+                                        <div class="col-12 mb-3">
                                             <label for="name" class="form-label">Full Name</label>
                                             <input type="text" name="name" id="name" class="form-control"
                                                 placeholder="Enter your full name">
                                         </div>
-                                        <div class="col-12 mb-4">
+                                        <div class="col-12 mb-3">
                                             <label for="email">Email</label>
-                                            <input type="email" class="form-control" name="email"
+                                            <input type="email" class="form-control" name="email" id="email"
                                                 placeholder="abc@ex.com">
                                         </div>
-                                        <div class="col-12 mb-4">
+                                        <div class="col-12 mb-3">
                                             <label for="msg">Type Your Message</label><br>
                                             <textarea name="msg" id="msg" class="form-control"></textarea>
                                         </div>
                                         <div class="col-6">
-                                            <button type="submit" class="px-4 btn btn-info" onclick = "feedback()">Submit</button>
+                                            <button type="submit" class="px-4 btn btn-info">Submit</button>
                                         </div>
                                     </div>
                                 </form>
-
                             </div>
                         </div>
                     </div>
@@ -82,11 +81,44 @@
 
         <!-- footer -->
     </div>
-    <footer class="p-3 mt-5 fs-large d-flex justify-content-center bg-secondary">
+    <footer class="p-3 mt-5 fs-large d-flex justify-content-center bg-secondary fixed-bottom">
         Copyright &copy;&nbsp;<strong>DD Form Builder</strong>&nbsp;2024-25.
         All rights reserved.
     </footer>
 </body>
 <?php include "./Include/script.php"; ?>
+<script>
+    $(document).ready(function () {
+        $("#fbmsg").validate({
+            rules: {
+                name: {
+                    required: true
+                },
+                email: {
+                    required: true,
+                    email: true
+                },
+                msg: {
+                    required: true
+                }
+            },
+            messages: {
+                name: {
+                    required: "<span class='text-danger'>Please enter your full name"
+                },
+                email: {
+                    required: "<span class='text-danger'>Please enter your email address",
+                    email: "<span class='text-danger'>Please enter a valid email address"
+                },
+                msg: {
+                    required: "<span class='text-danger'>Please enter a message"
+                }
+            },
+            submitHandler: function (form) {
+                form.submit();
+            }
+        });
+    });
+</script>
 
 </html>

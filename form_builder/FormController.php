@@ -24,7 +24,7 @@ class FormController {
         $this->conn->close();
     }
 
-    // CREATE form
+    // CREATE new form
     public function saveForm() {
         if (!isset($_SESSION['id'])) {
             echo json_encode(['success' => false, 'error' => 'User not logged in.']);
@@ -43,6 +43,7 @@ class FormController {
     
         $this->conn->begin_transaction();
         try {
+            // Insert into forms_master
             $stmt = $this->conn->prepare("INSERT INTO forms_master (user_id, form_name, created_at) VALUES (?, ?, NOW())");
             $stmt->bind_param("is", $userId, $formName);
             if (!$stmt->execute()) {
@@ -50,14 +51,20 @@ class FormController {
             }
             $formId = $stmt->insert_id;
             $stmt->close();
-
-            $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, options, created_at) VALUES (?, ?, ?, ?, NOW())");
+    
+            // Insert into formfield_master
+            $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, field_options, created_at) VALUES (?, ?, ?, ?, NOW())");
             foreach ($formData as $field) {
                 $fieldName = $field['label'];
                 $fieldType = $field['type'];
-                $options = isset($field['options']) ? implode(',', $field['options']) : null; // Convert options array to comma-separated string
+                $fieldOptions = null;
     
-                $stmt->bind_param("isss", $formId, $fieldName, $fieldType, $options);
+                // Handle radio, checkbox, and dropdown options
+                if (in_array($fieldType, ['radio', 'checkbox', 'select']) && isset($field['options'])) {
+                    $fieldOptions = json_encode($field['options']); // Store options as JSON string
+                }
+    
+                $stmt->bind_param("isss", $formId, $fieldName, $fieldType, $fieldOptions);
                 if (!$stmt->execute()) {
                     throw new Exception('Form field insert failed: ' . $stmt->error);
                 }
@@ -72,6 +79,7 @@ class FormController {
     }
     
     
+    
     // display form name
     public function displayAllForms() {
         if (!isset($_SESSION['id'])) {
@@ -81,6 +89,7 @@ class FormController {
     
         $userId = $_SESSION['id'];
     
+        // Get all forms for the logged-in user
         $query = "SELECT f.id, f.form_name FROM forms_master f WHERE f.user_id = ?";
     
         $stmt = $this->conn->prepare($query);
@@ -128,7 +137,7 @@ class FormController {
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Delete Form</h5>
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
@@ -172,22 +181,22 @@ class FormController {
                 $formName = $row['form_name'];
             }
   
-            $formfield[] = [
+            $formFields[] = [
                 'field_name' => $row['field_name'],
-                'field_type' => $row['field_type']
+                'field_type' => $row['field_type'],
             ];
         }
-        
-        if (empty($formfield)) {
+    
+        if (empty($formFields)) {
             echo "No form found.";
         } else {
             echo "<div class='container'>
                     <div class='mt-5 row justify-content-center'>
-                    <h1 class='mt-4'>{$formName}</h1>
+                    <h1>{$formName}</h1>
                     </div>";
-            echo "<form class='row justify-content-center mb-5'>";
+            echo "<form class='row justify-content-center mb'>";
             
-            foreach ($formfield as $field) {
+            foreach ($formFields as $field) {
                 echo "<div class='col-6 form-group mx-4 mt-3'>";
                 echo "<label for='{$field['field_name']}'>{$field['field_name']}:</label>";
                 
@@ -196,19 +205,20 @@ class FormController {
                         echo "<textarea class='form-control' cols='15' rows='4' placeholder='{$field['field_name']}'></textarea>";
                         break;
                     case 'radio':
-                        echo "<br><input type='radio' name='{$field['field_name']}' value='Option 1'> Option 1<br>";
-                        echo "<input type='radio' name='{$field['field_name']}' value='Option 2'> Option 2";
+                        echo "<br><input type='radio' name='{$field['field_type']}' value='Option 1'> Option 1<br>";
+                        echo "<input type='radio' name='{$field['field_type']}' value='Option 2'> Option 2";
                         break;
                     case 'checkbox':
                         echo "<br><input type='checkbox' name='{$field['field_name']}' value='Option 1'> Option 1<br>";
                         echo "<input type='checkbox' name='{$field['field_name']}' value='Option 2'> Option 2";
                         break;
                     default:
-                        echo "<input type='{$field['field_type']}' class='form-control' placeholder='{$field['field_name']}'>";
+                        echo "<input type='{$field['field_type']}' class='form-control' placeholder='{$field['field_name']}' reuired>";
                         break;
                 }
                 echo "</div>";
             }
+            
             echo "</form></div>";
         }
     }

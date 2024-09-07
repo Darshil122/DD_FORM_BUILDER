@@ -81,10 +81,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function createFieldTemplate(label, inputHTML) {
     return `
       <div class="form-field dragg" draggable="true" style="grid-column: span 1;">
-        <label class="form-label">
-          <input type="text" class="label-input" value="${label}">
+       <label class="form-label">          
+       <input type="text" class="label-input" value="${label}" oninput="updateLabel(this)">
         </label>
         ${inputHTML}
+        <button class="toggle-width-btn" type="button" onclick="toggleFieldWidth(this)">Toggle Width</button>
       </div>
     `;
   }
@@ -201,6 +202,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const formNameInput = document.getElementById("formName");
   const formDataInput = document.getElementById("form_data");
 
+  // Update the label text as user changes it
+  window.updateLabel = function(inputElement) {
+    // Update label live, if needed
+  };
+
   function createForm() {
     const formName = formNameInput.value;
     if (!formName) {
@@ -212,12 +218,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const inputElement = field.querySelector("input, textarea, select");
       const labelElement = field.querySelector(".label-input");
 
+      // Detect the correct input type
+      let fieldType = "";
+      if (inputElement.tagName.toLowerCase() === "textarea") {
+        fieldType = "textarea";
+      } else if (inputElement.tagName.toLowerCase() === "select") {
+        fieldType = "select";
+      } else {
+        fieldType = inputElement.type;
+      }
+
       return {
-        label: labelElement ? labelElement.value : "",
-        type:
-          inputElement.tagName.toLowerCase() === "textarea"
-            ? "textarea"
-            : inputElement.type,
+        label: labelElement ? labelElement.value : "", // Get updated label
+        type: fieldType,
         name: inputElement.name || "",
         options:
           inputElement.tagName.toLowerCase() === "select"
@@ -257,42 +270,4 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
       createForm();
     });
-
-  //feedback form
-  // document
-  //   .getElementById("contactForm")
-  //   .addEventListener("submit", function (event) {
-  //     event.preventDefault();
-  // function feedback(){
-  //     const feedbackData = {
-  //       name: document.getElementById("name").value,
-  //       email: document.getElementById("email").value,
-  //       msg: document.getElementById("msg").value,
-  //     };
-
-  //     fetch("FormController.php", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(feedbackData),
-  //     })
-  //       .then((response) => response.json())
-  //       .then((data) => {
-  //         if (data.success) {
-  //           alert("Form submitted successfully!");
-  //         } else {
-  //           alert("Error: " + data.error);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error:", error);
-  //       });
-  //   }
-  //   document
-  //   .getElementById("dynamic-form")
-  //   .addEventListener("submit", (event) => {
-  //     event.preventDefault();
-  //     feedback();
-  //   });
 });
