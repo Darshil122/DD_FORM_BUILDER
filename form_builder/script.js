@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
       formData: formFields,
     });
 
-    fetch("FormController.php", {
+    fetch("Controller.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -24,7 +24,7 @@
                         $formId = $_SESSION['id'];
 
                         if ($formId) {
-                            require 'FormController.php'; 
+                            require 'Controller.php'; 
                         }
                     ?>
                 </div>
