@@ -81,9 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function createFieldTemplate(label, inputHTML) {
     return `
       <div class="form-field dragg" draggable="true" style="grid-column: span 1;">
-       <label class="form-label">          
-       <input type="text" class="label-input" value="${label}" oninput="updateLabel(this)">
-        </label>
+        <label class="form-label">${label}</label>
         ${inputHTML}
         <button class="toggle-width-btn" type="button" onclick="toggleFieldWidth(this)">Toggle Width</button>
       </div>
@@ -216,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formFields = Array.from(formArea.children).map((field) => {
       const inputElement = field.querySelector("input, textarea, select");
-      const labelElement = field.querySelector(".label-input");
+      // const labelElement = field.querySelector(".label-input");
 
       // Detect the correct input type
       let fieldType = "";
@@ -229,7 +227,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       return {
-        label: labelElement ? labelElement.value : "", // Get updated label
+        label: field.querySelector("label").innerText,
+        // label: labelElement ? labelElement.value : "", // Get updated label
         type: fieldType,
         name: inputElement.name || "",
         options:

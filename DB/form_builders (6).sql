@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 05, 2024 at 08:55 PM
+-- Generation Time: Sep 08, 2024 at 03:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -45,16 +45,17 @@ CREATE TABLE `formfield_master` (
   `form_id` int(11) DEFAULT NULL,
   `field_name` varchar(255) DEFAULT NULL,
   `field_type` varchar(50) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `options` text DEFAULT NULL
+  `field_options` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `formfield_master`
 --
 
-INSERT INTO `formfield_master` (`id`, `form_id`, `field_name`, `field_type`, `created_at`, `options`) VALUES
-(1, 88, 'Text Field', 'text', '2024-09-05 18:54:29', NULL);
+INSERT INTO `formfield_master` (`id`, `form_id`, `field_name`, `field_type`, `field_options`, `created_at`) VALUES
+(1, 1, 'Message Field', 'text', NULL, '2024-09-08 13:30:02'),
+(2, 2, 'Radio Field', 'radio', NULL, '2024-09-08 13:35:21');
 
 -- --------------------------------------------------------
 
@@ -74,7 +75,8 @@ CREATE TABLE `forms_master` (
 --
 
 INSERT INTO `forms_master` (`id`, `user_id`, `form_name`, `created_at`) VALUES
-(88, 1, 'hello', '2024-09-05 18:54:29');
+(1, 1, 'test', '2024-09-08 13:30:02'),
+(2, 1, 'test', '2024-09-08 13:35:21');
 
 -- --------------------------------------------------------
 
@@ -131,7 +133,7 @@ ALTER TABLE `feedback_master`
 --
 ALTER TABLE `formfield_master`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `form_id` (`form_id`);
+  ADD KEY `formfield_master_ibfk_1` (`form_id`);
 
 --
 -- Indexes for table `forms_master`
@@ -168,13 +170,13 @@ ALTER TABLE `feedback_master`
 -- AUTO_INCREMENT for table `formfield_master`
 --
 ALTER TABLE `formfield_master`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `forms_master`
 --
 ALTER TABLE `forms_master`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `login_master`
@@ -196,7 +198,7 @@ ALTER TABLE `user_master`
 -- Constraints for table `formfield_master`
 --
 ALTER TABLE `formfield_master`
-  ADD CONSTRAINT `formfield_master_ibfk_1` FOREIGN KEY (`form_id`) REFERENCES `forms_master` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `formfield_master_ibfk_1` FOREIGN KEY (`form_id`) REFERENCES `forms_master` (`id`);
 
 --
 -- Constraints for table `forms_master`
