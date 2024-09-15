@@ -104,21 +104,47 @@
             },
             messages: {
                 name: {
-                    required: "<span class='text-danger'>Please enter your full name"
+                    required: "<span class='text-danger'>Please enter your full name</span>"
                 },
                 email: {
-                    required: "<span class='text-danger'>Please enter your email address",
-                    email: "<span class='text-danger'>Please enter a valid email address"
+                    required: "<span class='text-danger'>Please enter your email address</span>",
+                    email: "<span class='text-danger'>Please enter a valid email address</span>"
                 },
                 msg: {
-                    required: "<span class='text-danger'>Please enter a message"
+                    required: "<span class='text-danger'>Please enter a message</span>"
                 }
             },
             submitHandler: function (form) {
-                form.submit();
+                const feedbackData = {
+                    name: $("#name").val(),
+                    email: $("#email").val(),
+                    msg: $("#msg").val()
+                };
+
+                fetch('Controller.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(feedbackData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Feedback submitted successfully!');
+                        // Optionally clear the form
+                        $("#fbmsg")[0].reset();
+                    } else {
+                        alert('Failed to submit feedback: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
             }
         });
     });
 </script>
+
 
 </html>

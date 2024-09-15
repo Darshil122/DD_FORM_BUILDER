@@ -77,6 +77,28 @@ class Controller {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+
+    public function feedback(){
+        $data = json_decode(file_get_contents('php://input'), true);
+        $name = $data['name'];
+        $email = $data['email'];
+        $msg = $data['msg'];
+        // $this->conn->begin_transaction();
+        try {
+            $stmt = $this->conn->prepare("INSERT INTO feedback_master(name, email, message)
+            VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $name, $email, $msg);
+            if (!$stmt->execute()) {
+                throw new Exception('Feedback insert failed: ' . $stmt->error);
+            }
+            $this->conn->commit();
+            $stmt->close();
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            $this->conn->rollback();
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
     
     
     
@@ -154,7 +176,7 @@ class Controller {
         </div>
         ';
     }
-    // Display a form
+    // display form
     public function displayForm($formId) {
         $userId = $_SESSION['id'];
         if (!$userId) {
@@ -222,7 +244,7 @@ class Controller {
             echo "</form></div>";
         }
     }
-
+    //delete form
     public function deleteForm($formId) {
         if (!isset($_SESSION['id'])) {
             echo json_encode(['success' => false, 'error' => 'User not logged in.']);
@@ -252,10 +274,19 @@ class Controller {
     }
 }
 
-// Handle POST request to save a form
+// Handle POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $Controller = new Controller();
-    $Controller->saveForm();
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    if (isset($data['name']) && isset($data['email']) && isset($data['msg'])) {
+        $Controller->feedback();
+    } elseif (isset($data['formName']) && isset($data['formData'])) {
+        $Controller->saveForm();
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Invalid request.']);
+    }
 }
 
 // Handle DELETE request to delete a form

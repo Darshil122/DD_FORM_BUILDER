@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   formArea.addEventListener("dragover", handleDragOver);
   formArea.addEventListener("drop", handleDrop);
 
-  // Initialize sortable for drag and drop reordering
   new Sortable(formArea, {
     animation: 150,
     ghostClass: "sortable-ghost",
@@ -20,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function handleDragOver(event) {
-    event.preventDefault(); // Allow drop by preventing the default behavior
+    event.preventDefault();
   }
 
   function handleDrop(event) {
@@ -80,18 +79,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // Helper function to create a field template
   function createFieldTemplate(label, inputHTML) {
     return `
-      <div class="form-field dragg" draggable="true" style="grid-column: span 1;">
-        <label class="form-label">${label}</label>
-        ${inputHTML}
-        <button class="toggle-width-btn" type="button" onclick="toggleFieldWidth(this)">Toggle Width</button>
-      </div>
-    `;
+<div class="form-field dragg" draggable="true" style="grid-column: span 1;">
+  <label class="form-label">${label}</label>
+  ${inputHTML}
+  <button class="toggle-width-btn" type="button" onclick="toggleFieldWidth(this)">Toggle Width</button>
+</div>
+`;
   }
 
   // HTML generation functions for different field types
   function getTextFieldHTML() {
     return createFieldTemplate(
-      "Text Field",
+      '<input type="text" class="label" value="Text Field">',
       '<input type="text" class="form-control" placeholder="Enter text">'
     );
   }
@@ -105,14 +104,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getEmailFieldHTML() {
     return createFieldTemplate(
-      "Email Field",
+      '<input type="text" class="label" value="Email Field">',
       '<input type="email" class="form-control" placeholder="Enter email">'
     );
   }
 
   function getPasswordFieldHTML() {
     return createFieldTemplate(
-      "Password Field",
+      '<input type="text" class="label" value="Password Field">',
       '<input type="password" class="form-control" placeholder="Enter password">'
     );
   }
@@ -121,15 +120,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return createFieldTemplate(
       "Radio Field",
       `
-        <div class="radio-field">
-          <input type="radio" name="radio" value="option1">
-          <label>Option 1</label>
-        </div>
-        <div class="radio-field">
-          <input type="radio" name="radio" value="option2">
-          <label>Option 2</label>
-        </div>
-      `
+<div class="radio-field">
+  <input type="radio" name="radio" value="option1">
+  <label>Option 1</label>
+</div>
+<div class="radio-field">
+  <input type="radio" name="radio" value="option2">
+  <label>Option 2</label>
+</div>
+`
     );
   }
 
@@ -137,11 +136,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return createFieldTemplate(
       "Dropdown List",
       `
-        <select class="form-control">
-          <option value="1">Option 1</option>
-          <option value="2">Option 2</option>
-        </select>
-      `
+<select class="form-control">
+  <option value="1">Option 1</option>
+  <option value="2">Option 2</option>
+</select>
+`
     );
   }
 
@@ -156,9 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return createFieldTemplate(
       "Checkbox Field",
       `
-        <input type="checkbox" value="1"> Checkbox 1<br>
-        <input type="checkbox" value="2"> Checkbox 2
-      `
+<input type="checkbox" value="1"> Checkbox 1<br>
+<input type="checkbox" value="2"> Checkbox 2
+`
     );
   }
 
@@ -200,10 +199,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const formNameInput = document.getElementById("formName");
   const formDataInput = document.getElementById("form_data");
 
-  // Update the label text as user changes it
-  window.updateLabel = function(inputElement) {
-    // Update label live, if needed
-  };
 
   function createForm() {
     const formName = formNameInput.value;
@@ -214,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formFields = Array.from(formArea.children).map((field) => {
       const inputElement = field.querySelector("input, textarea, select");
-      // const labelElement = field.querySelector(".label-input");
+      const labelElement = field.querySelector(".label");
 
       // Detect the correct input type
       let fieldType = "";
@@ -227,8 +222,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       return {
-        label: field.querySelector("label").innerText,
-        // label: labelElement ? labelElement.value : "", // Get updated label
+        // label: field.querySelector("label").innerText,
+        label: labelElement ? labelElement.value : "", // Get updated label
         type: fieldType,
         name: inputElement.name || "",
         options:
