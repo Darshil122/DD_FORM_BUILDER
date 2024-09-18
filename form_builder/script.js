@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("==> DOMContentLoaded :");
   const draggables = document.querySelectorAll(".draging");
   const formArea = document.getElementById("form-area");
 
@@ -15,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function handleDragStart(event) {
+    // console.log("==> event:",event)
     event.dataTransfer.setData("text/plain", event.target.dataset.type);
   }
 
@@ -29,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function addFieldToFormArea(fieldType) {
+    // console.log("=> fieldType",fieldType);
     let fieldHTML = "";
 
     switch (fieldType) {
@@ -73,24 +76,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Insert the HTML into the form area
-    formArea.insertAdjacentHTML("beforeend", fieldHTML);
+    formArea.insertAdjacentHTML(
+      "beforeend",
+      `<div data-type="${fieldType}">${fieldHTML}</div>`
+    );
+    console.log(fieldType);
   }
 
   // Helper function to create a field template
+  // Function to create the form field template
   function createFieldTemplate(label, inputHTML) {
     return `
-<div class="form-field dragg" draggable="true" style="grid-column: span 1;">
-  <label class="form-label">${label}</label>
-  ${inputHTML}
-  <button class="toggle-width-btn" type="button" onclick="toggleFieldWidth(this)">Toggle Width</button>
-</div>
-`;
+    <div class="form-field dragg" draggable="true">
+        <label class="form-label">
+            <input type="text" class="label-input" value="${label}">
+        </label>
+        ${inputHTML}
+        <button class="toggle-width-btn" type="button" onclick="toggleFieldWidth(this)">Toggle Width</button>
+    </div>
+  `;
   }
 
   // HTML generation functions for different field types
   function getTextFieldHTML() {
     return createFieldTemplate(
-      '<input type="text" class="label" value="Text Field">',
+      "Text Field",
       '<input type="text" class="form-control" placeholder="Enter text">'
     );
   }
@@ -104,14 +114,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getEmailFieldHTML() {
     return createFieldTemplate(
-      '<input type="text" class="label" value="Email Field">',
+      "Email Field",
       '<input type="email" class="form-control" placeholder="Enter email">'
     );
   }
 
   function getPasswordFieldHTML() {
     return createFieldTemplate(
-      '<input type="text" class="label" value="Password Field">',
+      "Password Field",
       '<input type="password" class="form-control" placeholder="Enter password">'
     );
   }
@@ -191,14 +201,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Toggle the width of a form field between full and half-width
   window.toggleFieldWidth = function (button) {
-    const field = button.parentElement;
-    const currentSpan = field.style.gridColumn;
-    field.style.gridColumn = currentSpan === "span 2" ? "span 1" : "span 2";
+    const field = button.closest(".form-field"); // Get the parent .form-field div
+    field.classList.toggle("full-width"); // Toggle the class
   };
 
   const formNameInput = document.getElementById("formName");
   const formDataInput = document.getElementById("form_data");
-
 
   function createForm() {
     const formName = formNameInput.value;
@@ -209,22 +217,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formFields = Array.from(formArea.children).map((field) => {
       const inputElement = field.querySelector("input, textarea, select");
-      const labelElement = field.querySelector(".label");
+      const labelElement = field.querySelector(".label-input");
 
-      // Detect the correct input type
-      let fieldType = "";
-      if (inputElement.tagName.toLowerCase() === "textarea") {
-        fieldType = "textarea";
-      } else if (inputElement.tagName.toLowerCase() === "select") {
-        fieldType = "select";
-      } else {
-        fieldType = inputElement.type;
-      }
+      // Get the field type from the data attribute
+      const fieldType = field.dataset.type;
 
       return {
-        // label: field.querySelector("label").innerText,
-        label: labelElement ? labelElement.value : "", // Get updated label
-        type: fieldType,
+        label: labelElement ? labelElement.value : "", // Updated label
+        type: fieldType, // Get the field type from the data attribute
         name: inputElement.name || "",
         options:
           inputElement.tagName.toLowerCase() === "select"
