@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 15, 2024 at 07:14 AM
+-- Generation Time: Sep 21, 2024 at 08:17 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -64,26 +64,11 @@ CREATE TABLE `formfield_master` (
 --
 
 INSERT INTO `formfield_master` (`id`, `form_id`, `field_name`, `field_type`, `field_options`, `created_at`) VALUES
-(1, 1, 'Message Field', 'text', NULL, '2024-09-08 13:30:02'),
-(2, 2, 'Radio Field', 'radio', NULL, '2024-09-08 13:35:21'),
-(3, 3, 'Radio Field', 'text', NULL, '2024-09-08 17:44:48'),
-(4, 4, 'Radio Field', 'text', NULL, '2024-09-08 17:45:46'),
-(5, 5, 'Password Field', 'text', NULL, '2024-09-08 17:47:20'),
-(6, 6, '', 'text', NULL, '2024-09-08 18:00:45'),
-(7, 7, '', 'text', NULL, '2024-09-08 18:01:48'),
-(8, 8, 'gender', 'text', NULL, '2024-09-08 18:10:49'),
-(9, 9, 'Radio', 'text', NULL, '2024-09-08 18:14:42'),
-(10, 10, 'Radio', 'text', NULL, '2024-09-08 18:19:36'),
-(11, 11, 'Radio', 'text', NULL, '2024-09-08 18:28:39'),
-(12, 12, 'Radio', 'text', NULL, '2024-09-08 18:32:38'),
-(13, 13, 'Radio Field', 'radio', NULL, '2024-09-08 18:35:24'),
-(14, 14, 'Radio Field', 'radio', NULL, '2024-09-15 04:38:14'),
-(15, 15, '', 'text', NULL, '2024-09-15 04:56:49'),
-(16, 16, '', 'text', NULL, '2024-09-15 04:58:55'),
-(17, 17, '', 'text', NULL, '2024-09-15 04:59:21'),
-(18, 18, 'Text', 'text', NULL, '2024-09-15 05:00:13'),
-(19, 19, 'Email', 'text', NULL, '2024-09-15 05:02:30'),
-(20, 19, 'Password', 'text', NULL, '2024-09-15 05:02:30');
+(1, 1, 'Email', 'email', NULL, '2024-09-19 16:07:48'),
+(2, 1, 'Password', 'password', NULL, '2024-09-19 16:07:48'),
+(3, 2, 'Name', 'text', NULL, '2024-09-19 16:11:12'),
+(4, 2, 'Phone no.', 'number', NULL, '2024-09-19 16:11:12'),
+(5, 2, 'email', 'email', NULL, '2024-09-19 16:11:12');
 
 -- --------------------------------------------------------
 
@@ -103,25 +88,8 @@ CREATE TABLE `forms_master` (
 --
 
 INSERT INTO `forms_master` (`id`, `user_id`, `form_name`, `created_at`) VALUES
-(1, 1, 'test', '2024-09-08 13:30:02'),
-(2, 1, 'test', '2024-09-08 13:35:21'),
-(3, 1, 'test', '2024-09-08 17:44:48'),
-(4, 1, 'test1', '2024-09-08 17:45:46'),
-(5, 1, 'testing', '2024-09-08 17:47:20'),
-(6, 1, 'test2', '2024-09-08 18:00:45'),
-(7, 1, 'czxzcx', '2024-09-08 18:01:48'),
-(8, 1, 'test3', '2024-09-08 18:10:49'),
-(9, 1, 'hy', '2024-09-08 18:14:42'),
-(10, 1, 'sx', '2024-09-08 18:19:36'),
-(11, 1, 'dads', '2024-09-08 18:28:39'),
-(12, 1, 'dfs', '2024-09-08 18:32:38'),
-(13, 1, 'dsad', '2024-09-08 18:35:24'),
-(14, 1, 'sample', '2024-09-15 04:38:14'),
-(15, 1, 'test', '2024-09-15 04:56:49'),
-(16, 1, 'sample', '2024-09-15 04:58:55'),
-(17, 1, 'test1', '2024-09-15 04:59:21'),
-(18, 1, 'test2', '2024-09-15 05:00:13'),
-(19, 1, 'login test', '2024-09-15 05:02:30');
+(1, 1, 'login form', '2024-09-19 16:07:48'),
+(2, 1, 'Registration form', '2024-09-19 16:11:12');
 
 -- --------------------------------------------------------
 
@@ -215,13 +183,13 @@ ALTER TABLE `feedback_master`
 -- AUTO_INCREMENT for table `formfield_master`
 --
 ALTER TABLE `formfield_master`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `forms_master`
 --
 ALTER TABLE `forms_master`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `login_master`
