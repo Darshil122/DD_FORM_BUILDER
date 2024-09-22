@@ -21,11 +21,6 @@
                     <input type="number" name="number" id="number" placeholder="ex.1234567895" disabled>
                 </li>
                 <hr>
-                <!-- <li class="draging nav-item" draggable="true" data-type="mobile">
-                    <label for="email">Mobile No.&nbsp;:</label>
-                    <input type="email" name="email" id="email" placeholder="ex.abc@gmail.com" disabled>
-                </li>
-                <hr> -->
                 <li class="draging nav-item" draggable="true" data-type="email">
                     <label for="email">Email&nbsp;:</label>
                     <input type="email" name="email" id="email" placeholder="ex.abc@gmail.com" disabled>
@@ -83,6 +78,10 @@
                     <input type="week" name="week" id="week" disabled>
                 </li>
                 <hr>
+                <li class="draging nav-item" draggable="true" data-type="button">
+                    <label for="button">Button&nbsp;:</label><br>
+                    <input type="button" class="btn btn-success" name="button" id="button" value="Button" disabled>
+                </li>
             </ul>
         </nav>
 

@@ -33,10 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function addFieldToFormArea(fieldType) {
     // console.log("=> fieldType",fieldType);
     let fieldHTML = "";
+    const fieldName = `field_${Date.now()}`; // Unique name
 
     switch (fieldType) {
       case "text":
-        fieldHTML = getTextFieldHTML();
+        fieldHTML = getTextFieldHTML(fieldName);
         break;
       case "number":
         fieldHTML = getNumberFieldHTML();
@@ -71,6 +72,16 @@ document.addEventListener("DOMContentLoaded", () => {
       case "week":
         fieldHTML = getWeekFieldHTML();
         break;
+      case "button":
+        fieldHTML = getBtnFieldHTML();
+        break;
+      case "submit":
+        fieldHTML = getSubmitBtnFieldHTML();
+        break;
+      case "reset":
+        fieldHTML = getResetBtnFieldHTML();
+        break;
+
       default:
         console.error("Unknown field type:", fieldType);
     }
@@ -92,9 +103,16 @@ document.addEventListener("DOMContentLoaded", () => {
             <input type="text" class="label-input" value="${label}">
         </label>
         ${inputHTML}
-        <button class="toggle-width-btn" type="button" onclick="toggleFieldWidth(this)">Toggle Width</button>
     </div>
   `;
+  }
+
+  function createButtonFieldTemplate(buttonHTML) {
+    return `
+      <div class="form-field button-field dragg" draggable="true">
+        ${buttonHTML}
+      </div>
+    `;
   }
 
   // HTML generation functions for different field types
@@ -199,12 +217,66 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // Toggle the width of a form field between full and half-width
-  window.toggleFieldWidth = function (button) {
-    const field = button.closest(".form-field"); // Get the parent .form-field div
-    field.classList.toggle("full-width"); // Toggle the class
-  };
-
+  function getBtnFieldHTML() {
+    return createButtonFieldTemplate(
+      `
+      <div class="button-options">
+        <!-- Button to toggle collapse -->
+        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#btnOptionsCollapse${Date.now()}" aria-expanded="false" aria-controls="btnOptionsCollapse">
+          Button Options
+          <i class="fas fa-chevron-down"></i> <!-- Icon for down arrow -->
+        </button>
+        
+        <!-- Collapsible section -->
+        <div class="collapse mt-3" id="btnOptionsCollapse${Date.now()}">
+          <label>Button Text: </label>
+          <input type="text" class="form-control button-text" value="Click Me" placeholder="Enter Button Text">
+          
+          <label>Button Type: </label>
+          <select class="form-control button-type">
+            <option value="button">Button</option>
+            <option value="submit">Submit</option>
+            <option value="reset">Reset</option>
+          </select>
+          
+          <label>Button Style: </label>
+          <select class="form-control button-style">
+            <option value="btn-primary">Primary</option>
+            <option value="btn-secondary">Secondary</option>
+            <option value="btn-success">Success</option>
+            <option value="btn-danger">Danger</option>
+            <option value="btn-warning">Warning</option>
+            <option value="btn-info">Info</option>
+          </select>
+        </div>
+      </div>
+    
+      <!-- Preview button -->
+      <input type="button" class="btn btn-primary button-preview mt-3" value="Click Me">
+      `
+    );
+  }
+  
+  formArea.addEventListener('input', (event) => {
+    const field = event.target.closest('.form-field');
+    
+    if (field && field.classList.contains('button-field')) {
+      const buttonText = field.querySelector('.button-text').value;
+      const buttonType = field.querySelector('.button-type').value;
+      const buttonStyle = field.querySelector('.button-style').value;
+      const buttonPreview = field.querySelector('.button-preview');
+      
+      // Update button preview text
+      buttonPreview.value = buttonText;
+      
+      // Update button type
+      buttonPreview.setAttribute('type', buttonType);
+      
+      // Update button style
+      buttonPreview.className = `btn ${buttonStyle} button-preview`;
+    }
+  });
+  
   const formNameInput = document.getElementById("formName");
   const formDataInput = document.getElementById("form_data");
 
@@ -218,23 +290,33 @@ document.addEventListener("DOMContentLoaded", () => {
     const formFields = Array.from(formArea.children).map((field) => {
       const inputElement = field.querySelector("input, textarea, select");
       const labelElement = field.querySelector(".label-input");
-
-      // Get the field type from the data attribute
+  
       const fieldType = field.dataset.type;
-
+  
+      let options = null;
+      let buttonDetails = null;
+  
+      if (fieldType === "dropdown") {
+        options = Array.from(field.querySelector("select").options).map((option) => option.value);
+      } else if (fieldType === "button") {
+        buttonDetails = {
+          text: field.querySelector('.button-text').value,
+          type: field.querySelector('.button-type').value,
+          style: field.querySelector('.button-style').value,
+        };
+      }
+  
       return {
-        label: labelElement ? labelElement.value : "", // Updated label
-        type: fieldType, // Get the field type from the data attribute
-        name: inputElement.name || "",
-        options:
-          inputElement.tagName.toLowerCase() === "select"
-            ? Array.from(inputElement.options).map((option) => option.value)
-            : null,
+        label: labelElement ? labelElement.value : "",
+        type: fieldType,
+        name: inputElement ? inputElement.name : "",
+        options: options,
+        buttonDetails: buttonDetails
       };
     });
-
+  
     formDataInput.value = JSON.stringify({
-      formName: formName,
+      formName: formNameInput.value,
       formData: formFields,
     });
 

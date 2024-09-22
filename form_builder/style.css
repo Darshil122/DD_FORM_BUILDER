@@ -16,7 +16,7 @@
     width: 30%;
     border: 2px solid #b3b1b1;
     overflow: auto;
-    display: grid;
+    /* display: grid; */
     /* grid-template-columns: repeat(2, 1fr); */
     gap: 10px;
 }
@@ -45,16 +45,16 @@
     background-color: #007bff;
 }
 
-.form-field {
+/* .form-field {
     background-color: #fff;
     border: 1px solid #ced4da;
     border-radius: 5px;
     padding: 10px;
     display: flex;
     flex-direction: column;
-    /* grid-column: span 1; */
+    grid-column: span 1;
     height: 100px;
-}
+} */
 
   /* .form-field.full-width {
     grid-column: span 2; /* Full width 
@@ -65,7 +65,7 @@
     margin-bottom: 5px;
 }
 
-.form-field input,
+/* .form-field input,
 .form-field textarea,
 .form-field select {
     padding: 5px;
@@ -73,7 +73,7 @@
     border: 1px solid #ced4da;
     border-radius: 5px;
     width: 100%;
-}
+} */
 
 .toggle-width-btn {
     align-self: flex-end;

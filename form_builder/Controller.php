@@ -34,7 +34,7 @@ class Controller {
         $data = json_decode(file_get_contents('php://input'), true);
         $formName = $data['formName'];
         $formData = $data['formData'];
-        $userId = $_SESSION['id'];  
+        $userId = $_SESSION['id'];
     
         if (empty($formName) || empty($formData)) {
             echo json_encode(['success' => false, 'error' => 'Form name or data is empty.']);
@@ -52,23 +52,35 @@ class Controller {
             $formId = $stmt->insert_id;
             $stmt->close();
     
-            // Insert into formfield_master
-            $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, field_options, created_at) VALUES (?, ?, ?, ?, NOW())");
+            // Prepare to insert into formfield_master
+            $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, field_options, field_text, field_style, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+    
             foreach ($formData as $field) {
-                $fieldName = $field['label'];
-                $fieldType = $field['type'];
+                $fieldName = $field['label'];   // Field label
+                $fieldType = $field['type'];    // Field type (e.g., button, text, etc.)
                 $fieldOptions = null;
+                $fieldText = null;
+                $fieldStyle = null;
     
                 // Handle radio, checkbox, and dropdown options
                 if (in_array($fieldType, ['radio', 'checkbox', 'select']) && isset($field['options'])) {
                     $fieldOptions = json_encode($field['options']); // Store options as JSON string
                 }
     
-                $stmt->bind_param("isss", $formId, $fieldName, $fieldType, $fieldOptions);
+                // Handle button-specific data
+                if ($fieldType === 'button') {
+                    $fieldText = isset($field['buttonDetails']['text']) ? $field['buttonDetails']['text'] : null;
+                    $fieldStyle = isset($field['buttonDetails']['style']) ? $field['buttonDetails']['style'] : null;
+                }
+    
+                // Insert the field data into the formfield_master table
+                $stmt->bind_param("isssss", $formId, $fieldName, $fieldType, $fieldOptions, $fieldText, $fieldStyle);
+    
                 if (!$stmt->execute()) {
                     throw new Exception('Form field insert failed: ' . $stmt->error);
                 }
             }
+    
             $this->conn->commit();
             $stmt->close();
             echo json_encode(['success' => true]);
@@ -77,6 +89,8 @@ class Controller {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+    
+    
 
     public function feedback(){
         $data = json_decode(file_get_contents('php://input'), true);
@@ -183,29 +197,30 @@ class Controller {
             echo "User not logged in.";
             return;
         }
-
-        $qry = "SELECT fm.form_name, ff.field_name, ff.field_type FROM forms_master
-            fm JOIN formfield_master ff ON fm.id = ff.form_id WHERE fm.id = $formId";
-        
+    
+        $qry = "SELECT fm.form_name, ff.field_name, ff.field_type, ff.field_text, ff.field_style FROM forms_master fm 
+                JOIN formfield_master ff ON fm.id = ff.form_id WHERE fm.id = $formId";
+    
         $res = mysqli_query($this->conn, $qry);
-        
+    
         if (!$res) {
             echo "Error executing query: " . mysqli_error($this->conn);
             return;
         }
-        
-        $formfield = [];
+    
+        $formFields = [];  // Fixed typo here from 'formfield' to 'formFields'
         $formName = '';
-        
+    
         while ($row = mysqli_fetch_assoc($res)) {
-
             if (empty($formName)) {
                 $formName = $row['form_name'];
             }
-  
+    
             $formFields[] = [
                 'field_name' => $row['field_name'],
                 'field_type' => $row['field_type'],
+                'field_text' => $row['field_text'],   // Added field_text
+                'field_style' => $row['field_style'], // Added field_style
             ];
         }
     
@@ -217,33 +232,54 @@ class Controller {
                     <h1>{$formName}</h1>
                     </div>";
             echo "<form class='row justify-content-center mb'>";
-            
+    
             foreach ($formFields as $field) {
                 echo "<div class='col-6 form-group mx-4 mt-3'>";
                 echo "<label for='{$field['field_name']}'>{$field['field_name']}:</label>";
-                
+    
                 switch ($field['field_type']) {
                     case 'textarea':
                         echo "<textarea class='form-control' cols='15' rows='4' placeholder='{$field['field_name']}'></textarea>";
                         break;
+    
                     case 'radio':
                         echo "<br><input type='radio' name='{$field['field_type']}' value='Option 1'> Option 1<br>";
                         echo "<input type='radio' name='{$field['field_type']}' value='Option 2'> Option 2";
                         break;
+    
                     case 'checkbox':
                         echo "<br><input type='checkbox' name='{$field['field_name']}' value='Option 1'> Option 1<br>";
                         echo "<input type='checkbox' name='{$field['field_name']}' value='Option 2'> Option 2";
                         break;
+    
+                    case 'button':
+                        // For buttons, we use 'field_text' and 'field_style'
+                        echo "<button type='button' class='btn {$field['field_style']}'>{$field['field_text']}</button>";
+                        break;
+    
+                    case 'submit':
+                        // Submit buttons
+                        echo "<button type='submit' class='btn {$field['field_style']}'>{$field['field_text']}</button>";
+                        break;
+                    
+                        case 'reset':
+                            // reset buttons
+                            echo "<button type='reset' class='btn {$field['field_style']}'>{$field['field_text']}</button>";
+                            break;
+    
                     default:
-                        echo "<input type='{$field['field_type']}' class='form-control' placeholder='{$field['field_name']}' reuired>";
+                        // All other input types
+                        echo "<input type='{$field['field_type']}' class='form-control' placeholder='{$field['field_name']}' required>";
                         break;
                 }
+    
                 echo "</div>";
             }
-            
+    
             echo "</form></div>";
         }
     }
+    
     //delete form
     public function deleteForm($formId) {
         if (!isset($_SESSION['id'])) {

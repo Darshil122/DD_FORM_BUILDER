@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 21, 2024 at 08:17 PM
+-- Generation Time: Sep 22, 2024 at 07:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -56,19 +56,32 @@ CREATE TABLE `formfield_master` (
   `field_name` varchar(255) DEFAULT NULL,
   `field_type` varchar(50) DEFAULT NULL,
   `field_options` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `field_text` varchar(255) DEFAULT NULL,
+  `field_style` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `formfield_master`
 --
 
-INSERT INTO `formfield_master` (`id`, `form_id`, `field_name`, `field_type`, `field_options`, `created_at`) VALUES
-(1, 1, 'Email', 'email', NULL, '2024-09-19 16:07:48'),
-(2, 1, 'Password', 'password', NULL, '2024-09-19 16:07:48'),
-(3, 2, 'Name', 'text', NULL, '2024-09-19 16:11:12'),
-(4, 2, 'Phone no.', 'number', NULL, '2024-09-19 16:11:12'),
-(5, 2, 'email', 'email', NULL, '2024-09-19 16:11:12');
+INSERT INTO `formfield_master` (`id`, `form_id`, `field_name`, `field_type`, `field_options`, `created_at`, `field_text`, `field_style`) VALUES
+(1, 1, 'Email', 'email', NULL, '2024-09-19 16:07:48', NULL, NULL),
+(2, 1, 'Password', 'password', NULL, '2024-09-19 16:07:48', NULL, NULL),
+(3, 2, 'Name', 'text', NULL, '2024-09-19 16:11:12', NULL, NULL),
+(4, 2, 'Phone no.', 'number', NULL, '2024-09-19 16:11:12', NULL, NULL),
+(5, 2, 'email', 'email', NULL, '2024-09-19 16:11:12', NULL, NULL),
+(6, 3, 'Button', 'button', NULL, '2024-09-22 16:22:53', NULL, NULL),
+(7, 3, 'Button', 'submit', NULL, '2024-09-22 16:22:53', NULL, NULL),
+(8, 3, 'Button', 'reset', NULL, '2024-09-22 16:22:53', NULL, NULL),
+(9, 4, 'name', 'text', NULL, '2024-09-22 16:30:38', NULL, NULL),
+(10, 5, 'Button', 'button', NULL, '2024-09-22 16:41:02', NULL, NULL),
+(11, 7, 'Button', 'button', NULL, '2024-09-22 16:51:50', 'submit', 'btn-primary'),
+(12, 8, 'Button', 'button', NULL, '2024-09-22 16:59:54', 'button', 'btn-secondary'),
+(13, 8, 'Button', 'button', NULL, '2024-09-22 16:59:54', 'submit', 'btn-success'),
+(14, 8, 'Button', 'button', NULL, '2024-09-22 16:59:54', 'reset', 'btn-danger'),
+(15, 9, '', 'button', NULL, '2024-09-22 17:03:33', 'Publish', 'btn-warning'),
+(16, 10, '', 'button', NULL, '2024-09-22 17:18:15', 'confirm', 'btn-success');
 
 -- --------------------------------------------------------
 
@@ -89,7 +102,14 @@ CREATE TABLE `forms_master` (
 
 INSERT INTO `forms_master` (`id`, `user_id`, `form_name`, `created_at`) VALUES
 (1, 1, 'login form', '2024-09-19 16:07:48'),
-(2, 1, 'Registration form', '2024-09-19 16:11:12');
+(2, 1, 'Registration form', '2024-09-19 16:11:12'),
+(3, 1, 'test', '2024-09-22 16:22:53'),
+(4, 1, 'test', '2024-09-22 16:30:38'),
+(5, 1, 'test test', '2024-09-22 16:41:02'),
+(7, 1, 'test', '2024-09-22 16:51:50'),
+(8, 1, 'btn test', '2024-09-22 16:59:54'),
+(9, 1, 'test btn', '2024-09-22 17:03:33'),
+(10, 1, 'test test button', '2024-09-22 17:18:15');
 
 -- --------------------------------------------------------
 
@@ -183,13 +203,13 @@ ALTER TABLE `feedback_master`
 -- AUTO_INCREMENT for table `formfield_master`
 --
 ALTER TABLE `formfield_master`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `forms_master`
 --
 ALTER TABLE `forms_master`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `login_master`
