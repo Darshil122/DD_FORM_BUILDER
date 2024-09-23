@@ -40,7 +40,7 @@
                     <hr class="dropdown-divider">
                 </li>
                 <li><a class="dropdown-item" href="#"> <?php
-                            echo $_SESSION['email'];
+                            echo $_SESSION['uemail'];
                             ?></a></li>
             </ul>
         </li>

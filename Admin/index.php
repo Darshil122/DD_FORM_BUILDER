@@ -1,6 +1,6 @@
 <?php
 session_start();
-$email = $_SESSION["login"]; 
+$email = $_SESSION["email"]; 
 if($email == NULL){
     header("Location: login.php");
 }

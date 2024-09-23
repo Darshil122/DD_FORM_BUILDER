@@ -33,7 +33,7 @@
       if ($rows == 1) {
         $_SESSION['id'] = $id[0];
         $_SESSION["login"] = true;
-        $_SESSION["email"] = $email;
+        $_SESSION["uemail"] = $email;
         header("Location: index.php");
       } else {
         $a["msg"] = true;
