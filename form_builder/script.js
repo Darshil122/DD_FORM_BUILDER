@@ -98,14 +98,25 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to create the form field template
   function createFieldTemplate(label, inputHTML) {
     return `
-    <div class="form-field dragg" draggable="true">
-        <label class="form-label">
-            <input type="text" class="label-input" value="${label}">
-        </label>
-        ${inputHTML}
-    </div>
-  `;
+      <div class="form-field dragg" draggable="true">
+          <label class="form-label">
+              <input type="text" class="label-input" value="${label}">
+              <i class="far fa-trash-alt delete-icon"></i>
+          </label>
+          ${inputHTML}
+      </div>
+    `;
   }
+
+  // Event delegation to handle dynamically created elements
+document.addEventListener('click', function(event) {
+  if (event.target.classList.contains('delete-icon')) {
+    const formField = event.target.closest('.form-field');
+    formField.remove(); // Removes the entire field container
+  }
+});
+
+  
 
   function createButtonFieldTemplate(buttonHTML) {
     return `
