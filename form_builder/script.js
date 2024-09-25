@@ -268,6 +268,52 @@ document.addEventListener('click', function(event) {
     );
   }
   
+  document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('editBtn')) {
+      // Gather all form data before redirect
+      const formFields = Array.from(formArea.children).map((field) => {
+        const inputElement = field.querySelector("input, textarea, select");
+        const labelElement = field.querySelector(".label-input");
+        const fieldType = field.dataset.type;
+        console.log(fieldType);
+
+        let options = null;
+        let buttonDetails = null;
+
+        if (fieldType === "dropdown") {
+          options = Array.from(field.querySelector("select").options).map((option) => option.value);
+        } else if (fieldType === "button") {
+          buttonDetails = {
+            text: field.querySelector('.button-text').value,
+            type: field.querySelector('.button-type').value,
+            style: field.querySelector('.button-style').value,
+          };
+        }
+
+        return {
+          label: labelElement ? labelElement.value : "",
+          type: fieldType,
+          name: inputElement ? inputElement.name : "",
+          options: options,
+          buttonDetails: buttonDetails
+        };
+      });
+
+      // Serialize form data to JSON
+      const formData = JSON.stringify({
+        formName: document.getElementById("formName").value,
+        formData: formFields,
+      });
+
+      // Save form data in local storage (or send it via URL query string)
+      localStorage.setItem('formData', formData);
+
+      // Redirect to index page
+      window.location.href = "index.php"; // Adjust this path as needed
+    }
+  });
+
+
   formArea.addEventListener('input', (event) => {
     const field = event.target.closest('.form-field');
     

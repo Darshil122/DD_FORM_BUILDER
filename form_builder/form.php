@@ -51,7 +51,7 @@
     $('#confirmDeleteBtn').on('click', function() {
         if (formIdToDelete !== null) {
             $.ajax({
-                url: 'FormCOntroller.php',
+                url: 'Controller.php',
                 type: 'DELETE',
                 data: { id: formIdToDelete },
                 success: function(response) {

@@ -89,9 +89,8 @@ class Controller {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
-    
-    
 
+    //feedback form
     public function feedback(){
         $data = json_decode(file_get_contents('php://input'), true);
         $name = $data['name'];
@@ -113,8 +112,6 @@ class Controller {
                 echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
-    
-    
     
     // display form name
     public function displayAllForms() {
@@ -151,13 +148,15 @@ class Controller {
                 <li>
             <p class='float-left px-2 h5'>$formName</p>
         </li>
-         <li class='float-right px-2'>
-                <a href='?id=$formId' class='btn' data-id='$formId'><i class='fas fa-eye'></i></a>&nbsp;&nbsp;<i class='fas fa-edit'></i>
+         <li class='float-right'>
+                <a href='?id=$formId' class='btn' data-id='$formId'><i class='fas fa-eye'></i></a>
+                <a href='index.php?edit_id=$formId' class='btn editBtn' data-id='$formId'><i class='fas fa-edit'></i></a>
                 <a class='btn delete-form' data-id='$formId' data-toggle='modal' data-target='#confirmDeleteModal'><i class='fas fa-trash'></i></a>
-            </li>
-        </div>
-            </button></li>";
-        }        
+                </li>
+                </div>
+                </button></li>";
+            }        
+            // <a href='?source_id=$formId' class='btn'><i class='fas fa-code'></i></a>
 
 
         if ($stmt->num_rows === 0) {
@@ -219,8 +218,8 @@ class Controller {
             $formFields[] = [
                 'field_name' => $row['field_name'],
                 'field_type' => $row['field_type'],
-                'field_text' => $row['field_text'],   // Added field_text
-                'field_style' => $row['field_style'], // Added field_style
+                'field_text' => $row['field_text'],  
+                'field_style' => $row['field_style'],
             ];
         }
     
@@ -228,7 +227,7 @@ class Controller {
             echo "No form found.";
         } else {
             echo "<div class='container'>
-                    <div class='mt-5 row justify-content-center'>
+                    <div class='mt row justify-content-center'>
                     <h1>{$formName}</h1>
                     </div>";
             echo "<form class='row justify-content-center mb'>";
@@ -253,7 +252,6 @@ class Controller {
                         break;
     
                     case 'button':
-                        // For buttons, we use 'field_text' and 'field_style'
                         echo "<button type='button' class='btn {$field['field_style']}'>{$field['field_text']}</button>";
                         break;
     
@@ -268,7 +266,6 @@ class Controller {
                             break;
     
                     default:
-                        // All other input types
                         echo "<input type='{$field['field_type']}' class='form-control' placeholder='{$field['field_name']}' required>";
                         break;
                 }
@@ -277,6 +274,76 @@ class Controller {
             }
     
             echo "</form></div>";
+        }
+    }
+
+    //update form
+    public function updateForm($formId) {
+        if (!isset($_SESSION['id'])) {
+            echo json_encode(['success' => false, 'error' => 'User not logged in.']);
+            return;
+        }
+    
+        $userId = $_SESSION['id'];
+        $data = json_decode(file_get_contents('php://input'), true);
+        $formName = $data['formName'];
+        $formData = $data['formData'];
+    
+        if (empty($formName) || empty($formData)) {
+            echo json_encode(['success' => false, 'error' => 'Form name or data is empty.']);
+            return;
+        }
+    
+        $this->conn->begin_transaction();
+        try {
+            // Update the form name in the forms_master table
+            $stmt = $this->conn->prepare("UPDATE forms_master SET form_name = ? WHERE id = ? AND user_id = ?");
+            $stmt->bind_param("sii", $formName, $formId, $userId);
+            if (!$stmt->execute()) {
+                throw new Exception('Form update failed: ' . $stmt->error);
+            }
+            $stmt->close();
+    
+            // Delete existing form fields and insert the updated ones
+            $stmt = $this->conn->prepare("DELETE FROM formfield_master WHERE form_id = ?");
+            $stmt->bind_param("i", $formId);
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to delete old form fields: ' . $stmt->error);
+            }
+            $stmt->close();
+    
+            // Insert the updated fields into formfield_master
+            $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, field_options, field_text, field_style, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+    
+            foreach ($formData as $field) {
+                $fieldName = $field['label'];
+                $fieldType = $field['type'];
+                $fieldOptions = null;
+                $fieldText = null;
+                $fieldStyle = null;
+    
+                if (in_array($fieldType, ['radio', 'checkbox', 'select']) && isset($field['options'])) {
+                    $fieldOptions = json_encode($field['options']);
+                }
+    
+                if ($fieldType === 'button') {
+                    $fieldText = isset($field['buttonDetails']['text']) ? $field['buttonDetails']['text'] : null;
+                    $fieldStyle = isset($field['buttonDetails']['style']) ? $field['buttonDetails']['style'] : null;
+                }
+    
+                $stmt->bind_param("isssss", $formId, $fieldName, $fieldType, $fieldOptions, $fieldText, $fieldStyle);
+    
+                if (!$stmt->execute()) {
+                    throw new Exception('Failed to insert updated form fields: ' . $stmt->error);
+                }
+            }
+    
+            $this->conn->commit();
+            $stmt->close();
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            $this->conn->rollback();
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
     
@@ -323,6 +390,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo json_encode(['success' => false, 'error' => 'Invalid request.']);
     }
+}
+
+// Handle PUT request to update a form
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    parse_str(file_get_contents("php://input"), $data);
+    $formId = $data['id'] ?? 0; 
+    $Controller = new Controller();
+    $Controller->updateForm($formId);
 }
 
 // Handle DELETE request to delete a form
