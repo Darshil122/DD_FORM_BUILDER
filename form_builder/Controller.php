@@ -52,28 +52,28 @@ class Controller {
             $formId = $stmt->insert_id;
             $stmt->close();
     
-            // Prepare to insert into formfield_master
+            // Insert into formfield_master
             $stmt = $this->conn->prepare("INSERT INTO formfield_master (form_id, field_name, field_type, field_options, field_text, field_style, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
     
             foreach ($formData as $field) {
-                $fieldName = $field['label'];   // Field label
-                $fieldType = $field['type'];    // Field type (e.g., button, text, etc.)
+                $fieldName = $field['label'];
+                $fieldType = $field['type'];
                 $fieldOptions = null;
                 $fieldText = null;
                 $fieldStyle = null;
     
                 // Handle radio, checkbox, and dropdown options
                 if (in_array($fieldType, ['radio', 'checkbox', 'select']) && isset($field['options'])) {
-                    $fieldOptions = json_encode($field['options']); // Store options as JSON string
+                    $fieldOptions = json_encode($field['options']);  // Store options as JSON
                 }
     
-                // Handle button-specific data
+                // Handle button details
                 if ($fieldType === 'button') {
                     $fieldText = isset($field['buttonDetails']['text']) ? $field['buttonDetails']['text'] : null;
                     $fieldStyle = isset($field['buttonDetails']['style']) ? $field['buttonDetails']['style'] : null;
                 }
     
-                // Insert the field data into the formfield_master table
+                // Bind parameters and execute query
                 $stmt->bind_param("isssss", $formId, $fieldName, $fieldType, $fieldOptions, $fieldText, $fieldStyle);
     
                 if (!$stmt->execute()) {
@@ -89,6 +89,7 @@ class Controller {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+    
 
     //feedback form
     public function feedback(){
@@ -96,7 +97,6 @@ class Controller {
         $name = $data['name'];
         $email = $data['email'];
         $msg = $data['msg'];
-        // $this->conn->begin_transaction();
         try {
             $stmt = $this->conn->prepare("INSERT INTO feedback_master(name, email, message)
             VALUES (?, ?, ?)");
@@ -189,6 +189,7 @@ class Controller {
         </div>
         ';
     }
+
     // display form
     public function displayForm($formId) {
         $userId = $_SESSION['id'];
@@ -197,8 +198,9 @@ class Controller {
             return;
         }
     
-        $qry = "SELECT fm.form_name, ff.field_name, ff.field_type, ff.field_text, ff.field_style FROM forms_master fm 
-                JOIN formfield_master ff ON fm.id = ff.form_id WHERE fm.id = $formId";
+        $qry = "SELECT fm.form_name, ff.field_name, ff.field_type, ff.field_text, ff.field_style, ff.field_options 
+        FROM forms_master fm JOIN formfield_master ff ON fm.id = ff.form_id WHERE fm.id = $formId";
+
     
         $res = mysqli_query($this->conn, $qry);
     
@@ -207,21 +209,24 @@ class Controller {
             return;
         }
     
-        $formFields = [];  // Fixed typo here from 'formfield' to 'formFields'
+        $formFields = [];
         $formName = '';
     
         while ($row = mysqli_fetch_assoc($res)) {
             if (empty($formName)) {
                 $formName = $row['form_name'];
             }
-    
+        
+            $options = !empty($row['field_options']) ? json_decode($row['field_options'], true) : [];
+        
             $formFields[] = [
                 'field_name' => $row['field_name'],
                 'field_type' => $row['field_type'],
                 'field_text' => $row['field_text'],  
                 'field_style' => $row['field_style'],
+                'options' => $options
             ];
-        }
+        }        
     
         if (empty($formFields)) {
             echo "No form found.";
@@ -235,43 +240,51 @@ class Controller {
             foreach ($formFields as $field) {
                 echo "<div class='col-6 form-group mx-4 mt-3'>";
                 echo "<label for='{$field['field_name']}'>{$field['field_name']}:</label>";
-    
+            
                 switch ($field['field_type']) {
                     case 'textarea':
                         echo "<textarea class='form-control' cols='15' rows='4' placeholder='{$field['field_name']}'></textarea>";
                         break;
-    
+            
                     case 'radio':
-                        echo "<br><input type='radio' name='{$field['field_type']}' value='Option 1'> Option 1<br>";
-                        echo "<input type='radio' name='{$field['field_type']}' value='Option 2'> Option 2";
+                        foreach ($field['options'] as $option) {
+                            echo "<input type='radio' name='{$field['field_name']}' value='{$option}'> {$option}<br>";
+                        }
                         break;
-    
+            
                     case 'checkbox':
-                        echo "<br><input type='checkbox' name='{$field['field_name']}' value='Option 1'> Option 1<br>";
-                        echo "<input type='checkbox' name='{$field['field_name']}' value='Option 2'> Option 2";
+                        foreach ($field['options'] as $option) {
+                            echo "<input type='checkbox' name='{$field['field_name']}' value='{$option}'> {$option}<br>";
+                        }
                         break;
-    
+            
+                    case 'select':
+                        echo "<select class='form-control' name='{$field['field_name']}'>";
+                        foreach ($field['options'] as $option) {
+                            echo "<option value='{$option}'>{$option}</option>";
+                        }
+                        echo "</select>";
+                        break;
+            
                     case 'button':
                         echo "<button type='button' class='btn {$field['field_style']}'>{$field['field_text']}</button>";
                         break;
-    
+            
                     case 'submit':
-                        // Submit buttons
                         echo "<button type='submit' class='btn {$field['field_style']}'>{$field['field_text']}</button>";
                         break;
                     
-                        case 'reset':
-                            // reset buttons
-                            echo "<button type='reset' class='btn {$field['field_style']}'>{$field['field_text']}</button>";
-                            break;
-    
+                    case 'reset':
+                        echo "<button type='reset' class='btn {$field['field_style']}'>{$field['field_text']}</button>";
+                        break;
+            
                     default:
                         echo "<input type='{$field['field_type']}' class='form-control' placeholder='{$field['field_name']}' required>";
                         break;
                 }
-    
+            
                 echo "</div>";
-            }
+            }            
     
             echo "</form></div>";
         }
@@ -375,6 +388,35 @@ class Controller {
         }
         $stmt->close();
     }
+
+    public function getFormName($edit_id) {
+        $formName = ''; // Initialize the form name variable
+    
+        // Sanitize the edit_id to prevent SQL injection
+        $edit_id = intval($edit_id);
+    
+        // Fetch the form name from the database
+        $query = "SELECT form_name FROM forms_master WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+    
+        if ($stmt) {
+            $stmt->bind_param("i", $edit_id);
+            $stmt->execute();
+            $stmt->bind_result($formName);
+            $stmt->fetch();
+            $stmt->close();
+    
+            // Check if the form name is fetched
+            if ($formName) {
+                return $formName;
+            } else {
+                return "Error: Form name not found for id " . $edit_id;
+            }
+        } else {
+            return "Error: " . $this->conn->error;
+        }
+    }
+    
 }
 
 // Handle POST request
@@ -418,6 +460,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $formId = intval($_GET['id']);
         $Controller->displayForm($formId);
     }
+}
+
+// Handle GET request to fetch form name
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['edit_id'])) {
+    $controller = new Controller();
+    $formName = $controller->getFormName($_GET['edit_id']);
+    echo $formName;
 }
 
 ?>

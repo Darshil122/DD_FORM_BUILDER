@@ -35,7 +35,7 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-4 col-md-6">
-                                <form id="dynamic-form" action="" method="POST">
+                                <form id="dynamic-form" method="POST">
                                     <input type="hidden" name="form_data" id="form_data">
                                     <button type="submit" class="createform" onclick="createForm()">Create
                                         Form</button>
@@ -53,11 +53,8 @@
             All rights reserved.
         </footer>
     </div>
-
-    <!-- script -->
-
-    
+ 
 </body>
+<!-- script -->
 <?php include "./Include/script.php"; ?>
-
 </html>
