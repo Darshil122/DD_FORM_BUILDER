@@ -60,7 +60,7 @@
             <b>Login Form</b>
         </div>
 
-        <div class="card">
+        <div class="card card-outline card-primary">
             <div class="card-body login-card-body">
                 <p class="login-box-msg">Login Your Account</p>
 

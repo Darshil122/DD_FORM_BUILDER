@@ -239,7 +239,7 @@ class Controller {
     
             foreach ($formFields as $field) {
                 echo "<div class='col-6 form-group mx-4 mt-3'>";
-                echo "<label for='{$field['field_name']}'>{$field['field_name']}:</label>";
+                echo "<label for='{$field['field_name']}'>{$field['field_name']}</label>";
             
                 switch ($field['field_type']) {
                     case 'textarea':

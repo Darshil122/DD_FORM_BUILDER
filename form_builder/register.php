@@ -59,7 +59,7 @@
 <body class="hold-transition login-page">
   <div class="login-box">
     <div class="login-logo">
-      <b>Login Form</b>
+      <b>Register Form</b>
     </div>
 
     <div class="card card-outline card-primary">
@@ -67,8 +67,26 @@
         <!-- <p class="login-box-msg">Login Your Account</p> -->
 
         <form method="post" action="">
+        <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Enter Name" name="fname"
+                            value="<?php if(isset($_POST['register'])){ echo $name; }  ?>">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Enter Mobile no." name="no" pattern="[1-9]{1}[0-9]{9}"
+                            title="Enter 10 digit mobile number">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fa fa-phone"></span>
+                            </div>
+                        </div>
+                    </div>
           <div class="input-group mb-2">
-            <input type="email" class="form-control" placeholder="Email" name="email"
+            <input type="email" class="form-control" placeholder="Enter Email" name="email"
               value="<?php if(isset($_POST['login'])){ echo $email; }  ?>">
             <div class="input-group-append">
               <div class="input-group-text">
@@ -89,7 +107,7 @@
             </span>
           </div>
           <div class="input-group mb-2" id="show_hide_password">
-            <input type="password" class="form-control" placeholder="Password" name="password"
+            <input type="password" class="form-control" placeholder="Enter Password" name="password"
               value="<?php if(isset($_POST['login'])){ echo $password; }  ?>">
             <div class="input-group-append">
               <div class="input-group-text">
@@ -114,7 +132,7 @@
               </div>
             </div>
             <div class="col-4">
-              <button type="submit" class="btn btn-primary btn-block" name="login">Sign In</button>
+              <button type="submit" class="btn btn-primary btn-block" name="login">Sign Up</button>
             </div>
 
           </div>
@@ -127,11 +145,11 @@
           ?>
         </div>
         <p class="mb-1">
-          <a href="recover-password.php">I forgot my password</a>
+        <a href="login.php" class="text-center">I have already Registeration</a>
         </p>
-        <p class="mb-0">
-        <a href="register.php" class="text-center">Register a new membership</a>
-      </p>
+        <!-- <p class="mb-0">
+        <a href="registration.php" class="text-center">Register a new membership</a>
+      </p> -->
       </div>
       <!-- /.login-card-body -->
     </div>
