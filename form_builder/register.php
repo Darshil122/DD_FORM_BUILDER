@@ -3,37 +3,33 @@
   session_start();
 
   include "../DB/config.php";
-  if(isset($_POST['login'])){
-    // $id = $_POST['id'];
+  if(isset($_POST['register'])){
+    $name = mysqli_real_escape_string($con, $_POST['name']);
+    $mobile = mysqli_real_escape_string($con, $_POST['mobile']);
     $email = mysqli_real_escape_string($con, $_POST['email']);
     $password =mysqli_real_escape_string($con, $_POST['password']);
-    // $rememberme =mysqli_real_escape_string($conn, $_POST['rememberme']);
 
+    if($name == NULL){
+        $a["name_null"] = true;
+    }
+    if($mobile == NULL){
+        $a["mobile_null"] = true;
+    }
     if($email == NULL){
       $a["email_null"] = true;
     }
     elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
       $a["email_format"] = true;
     }
-
     if($password == NULL){
       $a["password_null"] = true;
     }
-    
-    // if($rememberme){
-    //   $a["Remember_me"] = true;
-    // }
 
     if(count($a) == 0){
-      $sql="SELECT * FROM user_master where email = '$email' && password='$password' ";
+      $sql="INSERT INTO user_master (name, number, email, password)VALUES('$name', '$mobile', '$email', '$password')";
       $result = mysqli_query($con,$sql);
 
-      $rows = mysqli_num_rows($result);
-      $id = mysqli_fetch_array($result);
-      if ($rows == 1) {
-        $_SESSION['id'] = $id[0];
-        $_SESSION["login"] = true;
-        $_SESSION["uemail"] = $email;
+      if ($result == 1) {
         header("Location: index.php");
       } else {
         $a["msg"] = true;
@@ -48,7 +44,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Log in</title>
+    <title>Sign Up Page</title>
     <link rel="icon" type="image/jpg" href="dist/img/navicon.png">
     <link rel="stylesheet" href="style.css">
 
@@ -68,8 +64,8 @@
                     <!-- <p class="login-box-msg">Login Your Account</p> -->
 
                     <form method="post" action="">
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="Enter Name" name="fname"
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" placeholder="Enter Name" name="name"
                                 value="<?php if(isset($_POST['register'])){ echo $name; }  ?>">
                             <div class="input-group-append">
                                 <div class="input-group-text">
@@ -77,14 +73,28 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="Enter Mobile no." name="no"
+                        <div class="mb-2">
+                            <?php 
+                                    if(array_key_exists("name_null",$a)){
+                                    echo '<span style="color:red">Please enter your name.';
+                                    }
+                                ?>
+                        </div>
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" placeholder="Enter Mobile no." name="mobile"
                                 pattern="[1-9]{1}[0-9]{9}" title="Enter 10 digit mobile number">
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fa fa-phone"></span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="mb-2">
+                            <?php 
+                                if(array_key_exists("mobile_null",$a)){
+                                echo '<span style="color:red">Please enter your mobile number.';
+                                }
+                            ?>
                         </div>
                         <div class="input-group mb-2">
                             <input type="email" class="form-control" placeholder="Enter Email" name="email"
@@ -118,7 +128,7 @@
                             </div>
                         </div>
                         <div class="mb-2">
-                            <?php 
+                            <?php
             if(array_key_exists("password_null",$a)){
               echo '<span style="color:red">Please enter your password.';
             }
@@ -134,7 +144,7 @@
                                 </div>
                             </div>
                             <div class="col-4">
-                                <button type="submit" class="btn btn-primary btn-block" name="login">Sign Up</button>
+                                <button type="submit" class="btn btn-primary btn-block" name="register">Sign Up</button>
                             </div>
 
                         </div>

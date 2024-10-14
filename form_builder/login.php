@@ -129,7 +129,7 @@
           ?>
                     </div>
                     <p class="mb-1">
-                        <a href="recover-password.php">I forgot my password</a>
+                        <a href="forgetPass.php">I forgot my password</a>
                     </p>
                     <p class="mb-0">
                         <a href="register.php" class="text-center">Register a new membership</a>

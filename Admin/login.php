@@ -24,7 +24,7 @@
     // }
 
     if(count($a) == 0){
-      $sql="SELECT * FROM login_master where email = '$email' && password='$password' ";
+      $sql="SELECT * FROM admin_master where email = '$email' && password='$password' ";
       $result = mysqli_query($con,$sql);
 
       $rows = mysqli_num_rows($result);

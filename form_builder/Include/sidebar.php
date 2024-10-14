@@ -1,4 +1,4 @@
-<aside class="main-sidebar bg-white" style="margin-top: 70px;">
+<aside class="main-sidebar bg-white" style="margin-top: 68px;">
     <!-- <a href="./index.php">
     <img src="dist/img/logo.png" alt="FormBuilder" height="80px" width="250px">
     </a> -->

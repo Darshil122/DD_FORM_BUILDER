@@ -389,18 +389,18 @@ class Controller {
         $stmt->close();
     }
 
-    public function getFormName($edit_id) {
+    public function getFormName($formId) {
         $formName = ''; // Initialize the form name variable
     
         // Sanitize the edit_id to prevent SQL injection
-        $edit_id = intval($edit_id);
+        $formId = intval($formId);
     
         // Fetch the form name from the database
         $query = "SELECT form_name FROM forms_master WHERE id = ?";
         $stmt = $this->conn->prepare($query);
     
         if ($stmt) {
-            $stmt->bind_param("i", $edit_id);
+            $stmt->bind_param("i", $formId);
             $stmt->execute();
             $stmt->bind_result($formName);
             $stmt->fetch();
@@ -410,7 +410,7 @@ class Controller {
             if ($formName) {
                 return $formName;
             } else {
-                return "Error: Form name not found for id " . $edit_id;
+                return "Error: Form name not found for id " . $formId;
             }
         } else {
             return "Error: " . $this->conn->error;
@@ -451,22 +451,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 }
 
 // Handle GET request to display a form
+// if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+//     $Controller = new Controller();
+
+//     if (!isset($_GET['id'])) {
+//         $Controller->displayAllForms();
+//     } else {
+//         $formId = intval($_GET['id']);
+//         $Controller->displayForm($formId);
+//     }
+// }
+
+// Handle GET request to fetch form name
+// if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
+//     $controller = new Controller();
+//     $formName = $controller->getFormName($_GET['id']);
+//     echo $formName;
+// }
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $Controller = new Controller();
-
+    
     if (!isset($_GET['id'])) {
         $Controller->displayAllForms();
     } else {
         $formId = intval($_GET['id']);
-        $Controller->displayForm($formId);
+        $formName = $Controller->getFormName($formId);
+        echo "<h1>$formName</h1>"; // Make sure to display the form name
+        $Controller->displayForm($formId); // Display the actual form fields
     }
 }
 
-// Handle GET request to fetch form name
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['edit_id'])) {
-    $controller = new Controller();
-    $formName = $controller->getFormName($_GET['edit_id']);
-    echo $formName;
-}
 
 ?>

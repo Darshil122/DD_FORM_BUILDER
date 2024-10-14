@@ -22,7 +22,6 @@
                 <div class="row">
                   <?php
                         $formId = $_SESSION['id'];
-
                         if ($formId) {
                             require 'Controller.php'; 
                         }
@@ -40,6 +39,7 @@
 </body>
 <?php include "./Include/script.php"; ?>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script src="script.js"></script> -->
 <script>
     $(document).ready(function() {
     var formIdToDelete = null;

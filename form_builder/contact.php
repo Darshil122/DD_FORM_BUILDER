@@ -81,7 +81,7 @@
 
         <!-- footer -->
     </div>
-    <footer class="p-3 mt-5 fs-large d-flex justify-content-center bg-secondary fixed-bottom">
+    <footer class="footer d-flex justify-content-center bg-secondary">
         Copyright &copy;&nbsp;<strong>DD Form Builder</strong>&nbsp;2024-25.
         All rights reserved.
     </footer>
