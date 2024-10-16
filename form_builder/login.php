@@ -2,7 +2,7 @@
   $a=array();
   session_start();
 
-  include "../DB/config.php";
+  include "Include/config.php";
   if(isset($_POST['login'])){
     // $id = $_POST['id'];
     $email = mysqli_real_escape_string($con, $_POST['email']);

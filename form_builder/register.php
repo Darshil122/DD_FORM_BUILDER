@@ -2,7 +2,7 @@
   $a=array();
   session_start();
 
-  include "../DB/config.php";
+  include "Include/config.php";
   if(isset($_POST['register'])){
     $name = mysqli_real_escape_string($con, $_POST['name']);
     $mobile = mysqli_real_escape_string($con, $_POST['mobile']);
